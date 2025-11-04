@@ -216,8 +216,8 @@ Run these tests to verify:
 - [ ] Login with email/password
 - [ ] Login with GitHub OAuth
 - [ ] Check sessionStorage in DevTools
-- [ ] Reload page (user stays logged in)
-- [ ] Close tab and reopen (user logged out)
+- [ ] Reload page
+- [ ] Close tab and reopen
 - [ ] Logout button works
 - [ ] Protected routes redirect to login
 - [ ] All components show user data

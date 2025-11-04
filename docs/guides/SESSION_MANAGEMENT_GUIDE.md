@@ -21,24 +21,24 @@ This implementation provides a **secure, optimized, and universal** user state m
 ┌─────────────────────────────────────────────────────────────┐
 │                       App Mount                             │
 └────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
+												 │
+												 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              SessionProvider (Client Component)             │
 │  • Runs once on mount                                       │
 │  • Fetches session from auth provider                       │
 │  • Hydrates Zustand store with user data                    │
 └────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
+												 │
+												 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                 Zustand User Store                          │
 │  Storage: sessionStorage (secure, auto-cleared on close)    │
 │  Persisted: user, isAuthenticated                           │
 │  Runtime Only: isHydrated, isLoading                        │
 └────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
+												 │
+												 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              Components Access Store                        │
 │  • useUser() - Get full user object                         │
@@ -64,34 +64,34 @@ All dependencies are already installed:
 import { useUser, useUserField, useIsAuthenticated } from "@/lib/store/user-store";
 
 export function ProfileCard() {
-  const user = useUser();
+	const user = useUser();
   
-  if (!user) return <div>Not logged in</div>;
+	if (!user) return <div>Not logged in</div>;
   
-  return (
-    <div>
-      <h1>{user.name}</h1>
-      <p>{user.email}</p>
-      {user.avatar && <img src={user.avatar} alt={user.name} />}
-    </div>
-  );
+	return (
+		<div>
+			<h1>{user.name}</h1>
+			<p>{user.email}</p>
+			{user.avatar && <img src={user.avatar} alt={user.name} />}
+		</div>
+	);
 }
 
 // Performance optimized - only re-renders when email changes
 export function EmailDisplay() {
-  const email = useUserField("email");
-  return <span>{email}</span>;
+	const email = useUserField("email");
+	return <span>{email}</span>;
 }
 
 // Auth guard
 export function ProtectedContent() {
-  const isAuthenticated = useIsAuthenticated();
+	const isAuthenticated = useIsAuthenticated();
   
-  if (!isAuthenticated) {
-    return <div>Please log in to view this content</div>;
-  }
+	if (!isAuthenticated) {
+		return <div>Please log in to view this content</div>;
+	}
   
-  return <div>Secret content!</div>;
+	return <div>Secret content!</div>;
 }
 ```
 
@@ -103,18 +103,18 @@ export function ProtectedContent() {
 import { useUserActions, useUser } from "@/lib/store/user-store";
 
 export function ProfileEditor() {
-  const user = useUser();
-  const { updateUser } = useUserActions();
+	const user = useUser();
+	const { updateUser } = useUserActions();
   
-  const updateName = () => {
-    updateUser({ name: "New Name" });
-  };
+	const updateName = () => {
+		updateUser({ name: "New Name" });
+	};
   
-  return (
-    <button onClick={updateName}>
-      Update Name
-    </button>
-  );
+	return (
+		<button onClick={updateName}>
+			Update Name
+		</button>
+	);
 }
 ```
 
@@ -128,16 +128,16 @@ import { authClient } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 
 export function LogoutButton() {
-  const { clearUser } = useUserActions();
-  const router = useRouter();
+	const { clearUser } = useUserActions();
+	const router = useRouter();
   
-  const handleLogout = async () => {
-    await authClient.signOut();
-    clearUser();
-    router.push("/auth/sign-in");
-  };
+	const handleLogout = async () => {
+		await authClient.signOut();
+		clearUser();
+		router.push("/auth/sign-in");
+	};
   
-  return <button onClick={handleLogout}>Logout</button>;
+	return <button onClick={handleLogout}>Logout</button>;
 }
 ```
 
@@ -169,11 +169,11 @@ storage: createJSONStorage(() => sessionStorage)
 ```typescript
 // ✅ GOOD: Only store user data, not tokens
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  // ❌ NO: accessToken, refreshToken, sessionId
+	id: string;
+	name: string;
+	email: string;
+	avatar?: string;
+	// ❌ NO: accessToken, refreshToken, sessionId
 }
 ```
 
@@ -186,10 +186,10 @@ Tokens stay in:
 
 ```typescript
 partialize: (state) => ({
-  // Only persist user data and auth status
-  user: state.user,
-  isAuthenticated: state.isAuthenticated,
-  // Runtime flags NOT persisted (prevents stale loading states)
+	// Only persist user data and auth status
+	user: state.user,
+	isAuthenticated: state.isAuthenticated,
+	// Runtime flags NOT persisted (prevents stale loading states)
 })
 ```
 
@@ -232,44 +232,44 @@ const { setUser, clearUser } = useUserActions();
 
 ```
 User clicks "Sign In"
-       │
-       ▼
+			 │
+			 ▼
 authClient.signIn.email()
-       │
-       ▼
+			 │
+			 ▼
 onSuccess callback
-       │
-       ├─► Fetch session (authClient.getSession())
-       │
-       ├─► setUser(session.data.user)
-       │
-       └─► Navigate to dashboard
+			 │
+			 ├─► Fetch session (authClient.getSession())
+			 │
+			 ├─► setUser(session.data.user)
+			 │
+			 └─► Navigate to dashboard
 ```
 
 ### OAuth Flow (GitHub, Google, etc.)
 
 ```
 User clicks "Sign in with GitHub"
-       │
-       ▼
+			 │
+			 ▼
 authClient.signIn.social({ provider: "github" })
-       │
-       ▼
+			 │
+			 ▼
 Redirects to GitHub
-       │
-       ▼
+			 │
+			 ▼
 GitHub authenticates user
-       │
-       ▼
+			 │
+			 ▼
 Redirects back to callbackURL
-       │
-       ▼
+			 │
+			 ▼
 SessionProvider detects new session
-       │
-       ▼
+			 │
+			 ▼
 Auto-hydrates store with user data
-       │
-       ▼
+			 │
+			 ▼
 User sees dashboard
 ```
 
@@ -277,23 +277,23 @@ User sees dashboard
 
 ```
 User reloads page
-       │
-       ▼
+			 │
+			 ▼
 Zustand rehydrates from sessionStorage
-       │
-       ├─► user: { id, name, email } (instant)
-       │
-       └─► isHydrated: true
-       │
-       ▼
+			 │
+			 ├─► user: { id, name, email } (instant)
+			 │
+			 └─► isHydrated: true
+			 │
+			 ▼
 SessionProvider runs
-       │
-       ├─► Fetches fresh session from auth API
-       │
-       ├─► Validates session is still active
-       │
-       └─► Updates store with latest user data
-              (or clears if session expired)
+			 │
+			 ├─► Fetches fresh session from auth API
+			 │
+			 ├─► Validates session is still active
+			 │
+			 └─► Updates store with latest user data
+							(or clears if session expired)
 ```
 
 ## 🧪 Testing
@@ -301,42 +301,42 @@ SessionProvider runs
 ### Check if Session Hydration Works
 
 1. **Test OAuth Login:**
-   ```bash
-   # Start dev server
-   npm run dev
+	 ```bash
+	 # Start dev server
+	 npm run dev
    
-   # Navigate to http://localhost:3000/auth/sign-in
-   # Click "Sign in with GitHub"
-   # After redirect, check browser DevTools:
-   ```
+	 # Navigate to http://localhost:3000/auth/sign-in
+	 # Click "Sign in with GitHub"
+	 # After redirect, check browser DevTools:
+	 ```
 
 2. **Inspect sessionStorage:**
-   ```javascript
-   // In browser console
-   JSON.parse(sessionStorage.getItem('user-storage'))
-   // Should show: { state: { user: {...}, isAuthenticated: true } }
-   ```
+	 ```javascript
+	 // In browser console
+	 JSON.parse(sessionStorage.getItem('user-storage'))
+	 // Should show: { state: { user: {...}, isAuthenticated: true } }
+	 ```
 
 3. **Test Persistence:**
-   ```bash
-   # After logging in:
-   # 1. Reload the page (Ctrl+R)
-   # 2. Check if user is still logged in
-   # 3. Open browser console:
-   ```
-   ```javascript
-   // In console
-   window.zustandStore = require('@/lib/store/user-store').useUserStore.getState()
-   console.log(zustandStore.user) // Should show user data
-   ```
+	 ```bash
+	 # After logging in:
+	 # 1. Reload the page (Ctrl+R)
+	 # 2. Check if user is still logged in
+	 # 3. Open browser console:
+	 ```
+	 ```javascript
+	 // In console
+	 window.zustandStore = require('@/lib/store/user-store').useUserStore.getState()
+	 console.log(zustandStore.user) // Should show user data
+	 ```
 
 4. **Test Session Expiry:**
-   ```bash
-   # 1. Log in
-   # 2. Close browser tab
-   # 3. Open new tab to your app
-   # 4. User should be logged out (sessionStorage cleared)
-   ```
+	 ```bash
+	 # 1. Log in
+	 # 2. Close browser tab
+	 # 3. Open new tab to your app
+	 # 4. User should be logged out (sessionStorage cleared)
+	 ```
 
 ## 🔧 Adapting for Other Auth Providers
 
@@ -349,18 +349,18 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
 
 const initSession = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+	const { data: { session } } = await supabase.auth.getSession();
   
-  if (session?.user) {
-    hydrateFromSession({
-      id: session.user.id,
-      name: session.user.user_metadata.name,
-      email: session.user.email!,
-      avatar: session.user.user_metadata.avatar_url,
-    });
-  } else {
-    hydrateFromSession(null);
-  }
+	if (session?.user) {
+		hydrateFromSession({
+			id: session.user.id,
+			name: session.user.user_metadata.name,
+			email: session.user.email!,
+			avatar: session.user.user_metadata.avatar_url,
+		});
+	} else {
+		hydrateFromSession(null);
+	}
 };
 ```
 
@@ -371,23 +371,23 @@ const initSession = async () => {
 import { useSession } from "next-auth/react";
 
 export function SessionProvider({ children }) {
-  const { data: session, status } = useSession();
-  const { hydrateFromSession } = useUserActions();
+	const { data: session, status } = useSession();
+	const { hydrateFromSession } = useUserActions();
   
-  useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      hydrateFromSession({
-        id: session.user.id,
-        name: session.user.name!,
-        email: session.user.email!,
-        avatar: session.user.image,
-      });
-    } else if (status === "unauthenticated") {
-      hydrateFromSession(null);
-    }
-  }, [session, status]);
+	useEffect(() => {
+		if (status === "authenticated" && session?.user) {
+			hydrateFromSession({
+				id: session.user.id,
+				name: session.user.name!,
+				email: session.user.email!,
+				avatar: session.user.image,
+			});
+		} else if (status === "unauthenticated") {
+			hydrateFromSession(null);
+		}
+	}, [session, status]);
   
-  return <>{children}</>;
+	return <>{children}</>;
 }
 ```
 
@@ -398,17 +398,17 @@ export function SessionProvider({ children }) {
 import { account } from '@/lib/appwrite';
 
 const initSession = async () => {
-  try {
-    const user = await account.get();
-    hydrateFromSession({
-      id: user.$id,
-      name: user.name,
-      email: user.email,
-      avatar: user.prefs?.avatar,
-    });
-  } catch {
-    hydrateFromSession(null);
-  }
+	try {
+		const user = await account.get();
+		hydrateFromSession({
+			id: user.$id,
+			name: user.name,
+			email: user.email,
+			avatar: user.prefs?.avatar,
+		});
+	} catch {
+		hydrateFromSession(null);
+	}
 };
 ```
 
@@ -439,14 +439,14 @@ const initSession = async () => {
 
 ```typescript
 export interface User {
-  id: string;              // Required: Unique user ID
-  name: string;            // Required: Display name
-  email: string;           // Required: Email address
-  avatar?: string;         // Optional: Profile picture URL
-  role?: string;           // Optional: User role (admin, user, etc.)
-  createdAt?: string;      // Optional: Account creation date (ISO string)
-  emailVerified?: boolean; // Optional: Email verification status
-  image?: string;          // Optional: Alternative to avatar
+	id: string;              // Required: Unique user ID
+	name: string;            // Required: Display name
+	email: string;           // Required: Email address
+	avatar?: string;         // Optional: Profile picture URL
+	role?: string;           // Optional: User role (admin, user, etc.)
+	createdAt?: string;      // Optional: Account creation date (ISO string)
+	emailVerified?: boolean; // Optional: Email verification status
+	image?: string;          // Optional: Alternative to avatar
 }
 ```
 
@@ -455,54 +455,54 @@ export interface User {
 ### ✅ DO
 
 1. **Use selective selectors**
-   ```tsx
-   const email = useUserField("email"); // ✅ Optimized
-   ```
+	 ```tsx
+	 const email = useUserField("email"); // ✅ Optimized
+	 ```
 
 2. **Separate actions from state**
-   ```tsx
-   const { updateUser } = useUserActions(); // ✅ Never re-renders
-   ```
+	 ```tsx
+	 const { updateUser } = useUserActions(); // ✅ Never re-renders
+	 ```
 
 3. **Check hydration before rendering**
-   ```tsx
-   const isHydrated = useIsHydrated();
-   if (!isHydrated) return <Skeleton />;
-   ```
+	 ```tsx
+	 const isHydrated = useIsHydrated();
+	 if (!isHydrated) return <Skeleton />;
+	 ```
 
 4. **Use sessionStorage for security**
-   ```typescript
-   storage: createJSONStorage(() => sessionStorage) // ✅
-   ```
+	 ```typescript
+	 storage: createJSONStorage(() => sessionStorage) // ✅
+	 ```
 
 ### ❌ DON'T
 
 1. **Access entire store in components**
-   ```tsx
-   const store = useUserStore(); // ❌ Re-renders on any change
-   ```
+	 ```tsx
+	 const store = useUserStore(); // ❌ Re-renders on any change
+	 ```
 
 2. **Store tokens in Zustand**
-   ```typescript
-   // ❌ NEVER store tokens
-   setUser({ ...user, accessToken: "..." });
-   ```
+	 ```typescript
+	 // ❌ NEVER store tokens
+	 setUser({ ...user, accessToken: "..." });
+	 ```
 
 3. **Use localStorage for sensitive data**
-   ```typescript
-   // ❌ Persists forever, accessible across tabs
-   storage: createJSONStorage(() => localStorage)
-   ```
+	 ```typescript
+	 // ❌ Persists forever, accessible across tabs
+	 storage: createJSONStorage(() => localStorage)
+	 ```
 
 4. **Forget to clear user on logout**
-   ```tsx
-   // ❌ User data remains in store
-   await authClient.signOut();
+	 ```tsx
+	 // ❌ User data remains in store
+	 await authClient.signOut();
    
-   // ✅ Always clear store
-   await authClient.signOut();
-   clearUser();
-   ```
+	 // ✅ Always clear store
+	 await authClient.signOut();
+	 clearUser();
+	 ```
 
 ## 🐛 Troubleshooting
 
@@ -520,7 +520,7 @@ export interface User {
 const isHydrated = useIsHydrated();
 
 if (!isHydrated) {
-  return <div>Loading...</div>; // Show same on client & server
+	return <div>Loading...</div>; // Show same on client & server
 }
 
 return <div>{user?.name}</div>; // Safe to render
@@ -577,3 +577,4 @@ You now have a **production-ready, secure, and optimized** user state management
 4. Close tab and reopen to verify logout
 
 **You're all set! 🎉**
+

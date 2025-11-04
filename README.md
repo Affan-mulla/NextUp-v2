@@ -1,73 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Nextup
 
-## 🎉 NEW: Production-Ready Session Management
+**Nextup** is a collaborative platform for **makers, startups, and users** — where ideas meet execution.  
+It helps **founders** launch and grow their products, while **users** can discover, follow, and contribute to the startups they love.
 
-This project now includes a **comprehensive, secure session management system** using Zustand that works with **all authentication methods** (email/password, OAuth, magic links, etc.).
-
-### ✨ Key Features
-- ✅ **Universal Auth Support** - Works with GitHub OAuth, email/password, and any Better Auth provider
-- ✅ **Automatic Session Hydration** - Detects and restores sessions on app mount
-- ✅ **Secure Storage** - Uses sessionStorage (auto-clears on tab close)
-- ✅ **Performance Optimized** - Selective re-renders with optimized selectors
-- ✅ **Type-Safe** - Full TypeScript support
-- ✅ **SSR Safe** - Prevents hydration mismatches
-
-### 📚 Quick Start
-```tsx
-// Get user data in any component
-import { useUser } from "@/lib/store/user-store";
-
-const user = useUser();
-// { id, name, email, avatar, ... }
-```
-
-### 🔒 Protect Routes
-```tsx
-import { AuthGuard } from "@/components/auth/auth-guards";
-
-<AuthGuard><YourProtectedPage /></AuthGuard>
-```
-
-### 📖 Complete Documentation
-- **[Start Here: IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Overview & quick start
-- **[Daily Use: QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Cheat sheet
-- **[Deep Dive: SESSION_MANAGEMENT_GUIDE.md](./SESSION_MANAGEMENT_GUIDE.md)** - Complete guide
-- **[Visual Docs: ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md)** - System diagrams
-- **[All Docs: SESSION_DOCS_INDEX.md](./SESSION_DOCS_INDEX.md)** - Documentation index
+> Built for both — the **builder** and the **believer**.
 
 ---
 
-## Getting Started
+## 🌐 Overview
 
-First, run the development server:
+Today, most launch platforms focus only on visibility — **Nextup** focuses on **community and feedback**.  
+It’s a space where:
+- 🚀 **Startups** can showcase products, manage feedback, and engage with their users.  
+- 💬 **Users** can follow launches, share insights, and grow their reputation.  
+- 🏆 **Both** benefit from real-time feedback loops, transparent growth, and recognition through leaderboards and launches.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Nextup bridges the gap between **launching** and **listening** — empowering products to grow *with* their community, not just in front of it.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌟 Core Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 👥 For Users
+- **Discover & Follow Products** – explore trending and upcoming launches.  
+- **Feedback System** – share ideas, report bugs, or suggest improvements.  
+- **Leaderboard & Badges** – earn points for engagement and climb the ranks.  
+- **Launch Alerts** – stay updated when followed products go live.  
+- **Dark Mode First** – clean, modern UI made for creators.
 
-## Learn More
+### 🧩 For Product Owners
+- **Product Dashboard** – manage your product’s profile, feedback, and updates.  
+- **Launch System** – schedule public or private launches.  
+- **Feedback Insights** – filter by user segments (paid, beta, free).  
+- **Community Engagement** – reply to feedback and grow loyal users.  
+- **Product Leaderboard** – compete for top spots and visibility.  
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Layer | Technology |
+|-------|-------------|
+| **Frontend** | Next.js 15 (App Router, React Server Components) |
+| **Styling** | Tailwind CSS (Dark Mode by Default) |
+| **State Management** | Zustand |
+| **Backend** |  Supabase |
+| **Auth** | Better Auth (GitHub) |
+| **Database** | PostgreSQL |
+| **Deployment** | Vercel / Docker |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> 💡 *Nextup is built to help products launch better — and users become part of that journey.*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+**Built with ❤️ by [Mulla Affan](https://github.com/Affan-mulla)**  

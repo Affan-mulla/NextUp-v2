@@ -54,10 +54,10 @@
 │  │  • Not accessible across tabs (security)                  │   │
 │  └────────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────────┘
-         │                                        ▲
-         │ HTTP Requests                          │ HTTP Responses
-         │ (with cookies)                         │ (with Set-Cookie)
-         ▼                                        │
+      │                                        ▲
+      │ HTTP Requests                          │ HTTP Responses
+      │ (with cookies)                         │ (with Set-Cookie)
+      ▼                                        │
 ┌──────────────────────────────────────────────────────────────────────┐
 │                      Better Auth Server                              │
 │  • Validates credentials                                             │
@@ -77,16 +77,16 @@
 │ enters      │
 │ credentials │
 └──────┬──────┘
-       │
-       ▼
+    │
+    ▼
 ┌────────────────────────────────────────────────────────┐
 │ LoginForm Component                                    │
 │                                                        │
 │ 1. handleSubmit()                                      │
 │ 2. authClient.signIn.email({ email, password })       │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Better Auth Server                                     │
 │                                                        │
@@ -95,8 +95,8 @@
 │ 3. Sets HTTP-only cookie (session token)              │
 │ 4. Returns user data (no token)                       │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ LoginForm - onSuccess Callback                         │
 │                                                        │
@@ -104,8 +104,8 @@
 │ 2. setUser(session.data.user)                         │
 │ 3. router.push("/")                                    │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Zustand Store                                          │
 │                                                        │
@@ -113,8 +113,8 @@
 │ • isAuthenticated: true                                │
 │ • Persisted to sessionStorage                          │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ User Redirected to Dashboard                           │
 │ • SessionProvider already ran (no duplicate fetch)     │
@@ -130,22 +130,22 @@
 │ clicks      │
 │ "GitHub"    │
 └──────┬──────┘
-       │
-       ▼
+    │
+    ▼
 ┌────────────────────────────────────────────────────────┐
 │ LoginForm Component                                    │
 │                                                        │
 │ 1. authClient.signIn.social({ provider: "github" })   │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Redirect to GitHub OAuth                               │
 │ • User authorizes app                                  │
 │ • GitHub redirects back with code                      │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Better Auth Callback Handler                           │
 │                                                        │
@@ -156,24 +156,24 @@
 │ 5. Sets HTTP-only cookie                               │
 │ 6. Redirects to callbackURL                            │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ App Page (e.g., /)                                     │
 │                                                        │
 │ • Layout mounts                                        │
 │ • SessionProvider runs                                 │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ SessionProvider                                        │
 │                                                        │
 │ 1. const session = await authClient.getSession()       │
 │ 2. hydrateFromSession(session.data.user)               │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Zustand Store Updated                                  │
 │                                                        │
@@ -181,8 +181,8 @@
 │ • isAuthenticated: true                                │
 │ • Persisted to sessionStorage                          │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ User Sees Dashboard with Profile                       │
 │ • Sidebar shows user avatar/name                       │
@@ -198,16 +198,16 @@
 │ reloads     │
 │ page (F5)   │
 └──────┬──────┘
-       │
-       ▼
+    │
+    ▼
 ┌────────────────────────────────────────────────────────┐
 │ Next.js App Loads                                      │
 │                                                        │
 │ • React renders                                        │
 │ • Layout component mounts                              │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Zustand Rehydration (Automatic)                        │
 │                                                        │
@@ -216,16 +216,16 @@
 │ 3. Sets isHydrated: true                               │
 │ 4. Triggers onRehydrateStorage callback                │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Components Render with Cached Data                     │
 │                                                        │
 │ • Sidebar shows user (instant, from sessionStorage)    │
 │ • No loading spinner (data already available)          │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ SessionProvider useEffect Runs                         │
 │                                                        │
@@ -234,8 +234,8 @@
 │ 3. Validates session is still active                   │
 │ 4. Updates store with fresh data (if changed)          │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Two Possible Outcomes:                                 │
 │                                                        │
@@ -258,15 +258,15 @@
 │ clicks      │
 │ "Logout"    │
 └──────┬──────┘
-       │
-       ▼
+    │
+    ▼
 ┌────────────────────────────────────────────────────────┐
 │ LogoutButton Component                                 │
 │                                                        │
 │ 1. await authClient.signOut()                          │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Better Auth Server                                     │
 │                                                        │
@@ -274,16 +274,16 @@
 │ 2. Clears HTTP-only cookie (session token)            │
 │ 3. Returns success                                     │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ LogoutButton - After signOut()                         │
 │                                                        │
 │ 1. clearUser()                                         │
 │ 2. router.push("/auth/sign-in")                        │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ Zustand Store                                          │
 │                                                        │
@@ -291,8 +291,8 @@
 │ • isAuthenticated: false                               │
 │ • sessionStorage updated (cleared)                     │
 └────────────────────────┬───────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌────────────────────────────────────────────────────────┐
 │ User Redirected to Login Page                          │
 │ • All components show logged-out state                 │
@@ -311,12 +311,12 @@
 │  isHydrated: true                                              │
 │  isLoading: false                                              │
 └────────────────────┬───────────────────────────────────────────┘
-                     │
-                     │ Components subscribe to specific slices
-                     │
-        ┌────────────┼────────────┬────────────┬────────────┐
-        │            │            │            │            │
-        ▼            ▼            ▼            ▼            ▼
+            │
+            │ Components subscribe to specific slices
+            │
+     ┌────────────┼────────────┬────────────┬────────────┐
+     │            │            │            │            │
+     ▼            ▼            ▼            ▼            ▼
 ┌──────────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
 │ useUser()    │ │useUser  │ │ useIs   │ │ useIs   │ │useUser  │
 │              │ │Field    │ │Auth     │ │Hydrated │ │Actions  │
@@ -376,11 +376,11 @@ Example: If only user.name changes:
 │  │   • Automatically sent with every request          │    │
 │  └────────────────────────────────────────────────────┘    │
 └────────────────────┬─────────────────────────────────────────┘
-                     │
-                     │ HTTPS (encrypted)
-                     │ Cookies auto-attached
-                     │
-                     ▼
+            │
+            │ HTTPS (encrypted)
+            │ Cookies auto-attached
+            │
+            ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                    SERVER (Better Auth)                      │
 │                                                              │
@@ -433,8 +433,8 @@ Man-in-the-Middle:
 │                  Returns User Data                          │
 │                        ↓                                    │
 └────────────────────────┼───────────────────────────────────┘
-                         │
-                         ▼
+                │
+                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                 STATE MANAGEMENT LAYER                      │
 │                                                             │
@@ -462,8 +462,8 @@ Man-in-the-Middle:
 │  │  └────────────────────────────────────────┘      │      │
 │  └──────────────────┬───────────────────────────────┘      │
 └─────────────────────┼───────────────────────────────────────┘
-                      │
-                      ▼
+             │
+             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                  PRESENTATION LAYER                         │
 │                                                             │
@@ -482,20 +482,20 @@ Man-in-the-Middle:
 
 ```
 Time: 0ms ───────────► 50ms ───────────► 200ms ──────────► ∞
-       │                │                 │                │
-       │                │                 │                │
+    │                │                 │                │
+    │                │                 │                │
 App    │ Zustand        │ Session         │ Components    │ User
 Mount  │ Rehydrates     │ Provider        │ Have Fresh    │ Interacts
-       │ (instant)      │ Fetches         │ Data          │
-       │                │ (async)         │                │
-       ▼                ▼                 ▼                ▼
+    │ (instant)      │ Fetches         │ Data          │
+    │                │ (async)         │                │
+    ▼                ▼                 ▼                ▼
 ┌──────────┐      ┌──────────┐      ┌──────────┐    ┌──────────┐
 │ Store    │      │ Store    │      │ Store    │    │ Store    │
 │ Empty    │  ──► │ Has      │  ──► │ Validated│ ──►│ Updated  │
 │          │      │ Cached   │      │ Fresh    │    │ (if      │
 │          │      │ Data     │      │ Data     │    │  needed) │
 └──────────┘      └──────────┘      └──────────┘    └──────────┘
-                   (instant)         (50-200ms)
+             (instant)         (50-200ms)
 
 User Experience:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
