@@ -152,12 +152,14 @@ model Post {
 }
 
 model Ideas {
-  id          String   @id @default(cuid())
-  title       String
-  description Json
-  userId      String
-  votesCount  Int      @default(0)
-  createdAt   DateTime @default(now())
+  id              String    @id @default(cuid())
+  title           String
+  description     Json
+  uploadedImages  String[]  @default([])
+  userId          String
+  votesCount      Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
 
   author   User       @relation(fields: [userId], references: [id])
   votes    Votes[]

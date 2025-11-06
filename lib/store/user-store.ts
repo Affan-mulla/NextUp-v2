@@ -178,10 +178,10 @@ export const useUserStore = create<UserStore>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, action) => {
         // Mark as hydrated after rehydration completes
         if (state) {
-          state.setHydrated();
+          state.isHydrated = true;
         }
       },
     }
