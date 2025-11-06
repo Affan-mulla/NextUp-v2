@@ -21,6 +21,7 @@ import GithubBtn from "./GithubBtn";
 import AuthCard from "./AuthCard";
 import { Spinner } from "../ui/spinner";
 import { useUserActions } from "@/lib/store/user-store";
+import { useInvalidateSession } from "@/lib/hooks/useSession";
 
 export function SignupForm({
   className,
@@ -35,6 +36,7 @@ export function SignupForm({
     resolver: zodResolver(signUpSchema),
   });
   const { hydrateFromSession } = useUserActions();
+  const invalidateSession = useInvalidateSession();
 
   const onSubmit = async (data: SignUpType) => {
 
@@ -61,6 +63,8 @@ export function SignupForm({
           
           if (user) {
             hydrateFromSession(user);
+            // Invalidate the session query cache so SessionProvider fetches latest
+            await invalidateSession();
           }
           
           reset();

@@ -29,6 +29,7 @@ import GithubBtn from "./GithubBtn";
 import AuthCard from "./AuthCard";
 import { Spinner } from "../ui/spinner";
 import { useUserActions } from "@/lib/store/user-store";
+import { useInvalidateSession } from "@/lib/hooks/useSession";
 
 export function LoginForm({
   className,
@@ -43,6 +44,7 @@ export function LoginForm({
     resolver: zodResolver(signInSchema),
   });
   const { hydrateFromSession } = useUserActions();
+  const invalidateSession = useInvalidateSession();
 
   const onSubmit = async (data: SignInType) => {
     await authClient.signIn.email(
@@ -63,6 +65,8 @@ export function LoginForm({
           
           if (user) {
             hydrateFromSession(user);
+            // Invalidate the session query cache so SessionProvider fetches latest
+            await invalidateSession();
           }
           
           reset();

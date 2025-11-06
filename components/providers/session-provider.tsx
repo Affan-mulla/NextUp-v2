@@ -15,11 +15,18 @@ import { useSessionQuery } from "@/lib/hooks/useSession";
  * - Production logging (errors only, optional debug mode)
  * - Centralized session mapping via session-utils
  * 
- * Usage: Wrap your app layout with this provider
+ * Flow:
+ * 1. Store rehydrates from sessionStorage (persist middleware)
+ * 2. useIsHydrated() returns true
+ * 3. SessionProvider fetches session from API
+ * 4. If session exists, hydrateFromSession() updates the store
+ * 5. If no session, the stored session is cleared
+ * 
+ * Usage: Wrap your app layout ONCE with this provider (only in root layout)
  */
 export function SessionProvider({ 
   children,
-  debug = false, // Enable detailed logging in development
+  debug = true, // Enable detailed logging in development
 }: { 
   children: React.ReactNode;
   debug?: boolean;
@@ -27,6 +34,7 @@ export function SessionProvider({
   const { hydrateFromSession, setLoading } = useUserActions();
   const isHydrated = useIsHydrated();
   const isInitialized = useRef(false);
+  const debugRef = useRef(debug);
 
   // Use React Query to fetch/cached the session. React Query controls when
   // the session is refetched (staleTime, window focus, etc.). We only
@@ -34,36 +42,32 @@ export function SessionProvider({
   const { data: sessionUser, isLoading: queryLoading } = useSessionQuery({
     staleTime: 1000 * 60 * 5, // 5 minutes
     onSuccess: (user) => {
+      if (debugRef.current) {
+        console.log("🔄 onSuccess callback - hydrating with:", user)
+      }
       hydrateFromSession(user)
       setLoading(false)
-      if (debug && user) console.log("✅ Session hydrated:", user.email)
-      if (debug && !user) console.log("⚠️ No active session")
+      if (debugRef.current && user) console.log("✅ Session hydrated:", user.email)
+      if (debugRef.current && !user) console.log("⚠️ No active session found")
     }
   })
+// Wait for store hydration first
+useEffect(() => {
+  if (!isHydrated) return
+  if (debugRef.current) console.log("✅ Store hydrated, now waiting for session fetch...")
+  setLoading(true)
+}, [isHydrated])
 
-  useEffect(() => {
-    // Prevent duplicate initialization (React Strict Mode, hot reload)
-    if (isInitialized.current) return;
-    
-    // Only initialize after store has rehydrated from storage
-    if (!isHydrated) return;
-
-    isInitialized.current = true;
-
-    // If React Query is still loading we mark loading; otherwise the
-    // onSuccess handler will hydrate and clear loading.
-    if (queryLoading) {
-      setLoading(true)
-    } else if (sessionUser !== undefined) {
-      hydrateFromSession(sessionUser ?? null)
-      setLoading(false)
-    }
-
-    // Cleanup function (though initSession has no side effects to clean)
-    return () => {
-      // Future: Could add session polling cleanup here if needed
-    };
-  }, [isHydrated, queryLoading, sessionUser, hydrateFromSession]);
+// Handle session query changes
+useEffect(() => {
+  if (!isHydrated) return
+  if (queryLoading) return
+  if (sessionUser !== undefined) {
+    hydrateFromSession(sessionUser ?? null)
+    setLoading(false)
+    isInitialized.current = true
+  }
+}, [isHydrated, queryLoading, sessionUser])
 
   return <>{children}</>;
 }

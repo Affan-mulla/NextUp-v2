@@ -5,7 +5,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { SessionProvider } from "@/components/providers/session-provider";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AddCircleHalfDotIcon,
@@ -15,14 +14,11 @@ import Link from "next/link";
 
 const layout = async({ children }: { children: React.ReactNode }) => {
   "use cache";
-  // Enable debug logging in development mode
-  const isDev = process.env.NODE_ENV === "development";
 
   return (
-    <SessionProvider debug={isDev}>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
           <header className="flex h-16 border-b shrink-0 items-center gap-2 justify-between transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
@@ -54,7 +50,6 @@ const layout = async({ children }: { children: React.ReactNode }) => {
           {children}
         </SidebarInset>
       </SidebarProvider>
-    </SessionProvider>
   );
 };
 

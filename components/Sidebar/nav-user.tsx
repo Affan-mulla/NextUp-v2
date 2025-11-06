@@ -34,7 +34,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
-import { useUser, useUserActions, useIsHydrated } from "@/lib/store/user-store"
+import { useUser, useUserActions, useIsHydrated, useIsLoading } from "@/lib/store/user-store"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function NavUser() {
@@ -46,21 +46,19 @@ export function NavUser() {
   const user = useUser()
   const { clearUser } = useUserActions()
   const isHydrated = useIsHydrated()
+  const isLoading = useIsLoading()
   
   // Show loading skeleton while hydrating
-  if (!isHydrated) {
+  if (!isHydrated || isLoading) {
     return (
-      <SidebarMenu className="bg-accent rounded-md dark:border-x-0 dark:border-b-0 border-2 border-border box-border dark:shadow">
-        <SidebarMenuItem>
           <div className="flex items-center gap-2 px-2 py-1.5">
             <Skeleton className="h-8 w-8 rounded-lg" />
-            <div className="flex-1 space-y-2">
+            <div className="flex flex-col gap-2">
               <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-4 w-20" />
             </div>
+
           </div>
-        </SidebarMenuItem>
-      </SidebarMenu>
     )
   }
   
