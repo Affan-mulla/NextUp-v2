@@ -8,6 +8,7 @@
 import { useCallback, useState } from "react";
 import { SerializedEditorState } from "lexical";
 import { toast } from "sonner";
+import axios from "axios";
 import {
   uploadFilesToSupabase,
   isSupabaseConfigured,
@@ -178,24 +179,16 @@ export const useCreateIdea = () => {
           uploadedImageCount: uploadedImageUrls.length,
         });
 
-        const response = await fetch("/api/ideas/create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestPayload),
-        });
+        const { data } = await axios.post<CreateIdeaResponse>(
+          "/api/ideas/create",
+          requestPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          const errorMsg = errorData.error || "Failed to create idea";
-          console.error("[useCreateIdea] ❌ API error:", errorMsg);
-          toast.dismiss(toastId);
-          toast.error(errorMsg);
-          throw new Error(errorMsg);
-        }
-
-        const data: CreateIdeaResponse = await response.json();
         console.log("[useCreateIdea] ✅ API response success:", data);
 
         // ============================================================
@@ -228,8 +221,14 @@ export const useCreateIdea = () => {
       } catch (error) {
         console.error("[useCreateIdea] ❌ Unexpected error:", error);
         toast.dismiss();
-        const errorMessage =
-          error instanceof Error ? error.message : "An error occurred";
+        
+        let errorMessage = "An error occurred";
+        if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.error || error.message || "Failed to create idea";
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
         toast.error(errorMessage);
 
         setState((prev) => ({

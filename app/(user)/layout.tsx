@@ -8,9 +8,10 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AddCircleHalfDotIcon,
-  AddSquareIcon,
 } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import { Suspense } from "react";
+import { IdeaFeedSkeleton } from "@/components/feed/IdeaCardSkeleton";
 
 const layout = async({ children }: { children: React.ReactNode }) => {
   "use cache";
@@ -47,7 +48,9 @@ const layout = async({ children }: { children: React.ReactNode }) => {
               </Link>
             </div>
           </header>
+          <Suspense fallback={<IdeaFeedSkeleton/>}>
           {children}
+          </Suspense>
         </SidebarInset>
       </SidebarProvider>
   );

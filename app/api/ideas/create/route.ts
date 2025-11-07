@@ -191,6 +191,7 @@ export async function POST(request: NextRequest) {
           description: finalDescription,
           uploadedImages: finalUploadedImages,
           userId,
+          createdAt: new Date(),
         },
         include: {
           author: {

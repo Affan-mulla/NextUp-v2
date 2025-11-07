@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import axios from "axios"
 import type { User } from "@/lib/store/user-store"
 
 const SESSION_QUERY_KEY = ["session"]
@@ -19,10 +20,10 @@ export function useSessionQuery(options?: {
   const query = useQueryAny({
     queryKey: SESSION_QUERY_KEY,
     queryFn: async () => {
-      const res = await fetch('/api/session', { credentials: 'include' })
-      if (!res.ok) throw new Error('Failed to fetch session')
-      const json = await res.json()
-      return json.user ?? null
+      const { data } = await axios.get('/api/session', { 
+        withCredentials: true 
+      })
+      return data.user ?? null
     },
   // sensible defaults - you can override via options
   staleTime: options?.staleTime ?? 1000 * 60 * 5, // 5 minutes
