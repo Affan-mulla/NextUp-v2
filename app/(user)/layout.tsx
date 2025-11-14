@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { Suspense } from "react";
 import { IdeaFeedSkeleton } from "@/components/feed/IdeaCardSkeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const layout = async({ children }: { children: React.ReactNode }) => {
   "use cache";
@@ -48,9 +49,11 @@ const layout = async({ children }: { children: React.ReactNode }) => {
               </Link>
             </div>
           </header>
+          <ScrollArea className="h-[calc(100vh-4rem)]">
           <Suspense fallback={<IdeaFeedSkeleton/>}>
           {children}
           </Suspense>
+          </ScrollArea>
         </SidebarInset>
       </SidebarProvider>
   );

@@ -8,6 +8,8 @@ import { createClient } from "@/utils/supabase/server";
 import { cache } from "react";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
+import { VoteType } from "@/hooks/useVoting";
+import { IdeaById } from "@/types/Idea";
 
 export interface IdeaWithAuthor {
   id: string;
@@ -45,13 +47,16 @@ const PAGE_SIZE = 10;
  * Cached for optimal performance in server components
  */
 export const getIdeas = cache(
-  async (cursor?: string, limit: number = PAGE_SIZE): Promise<IdeasResponse> => {
+  async (
+    cursor?: string,
+    limit: number = PAGE_SIZE
+  ): Promise<IdeasResponse> => {
     const supabase = await createClient();
 
     // Get current user from Better Auth session
     const headersList = await headers();
-    const session = await auth.api.getSession({ 
-      headers: headersList as any 
+    const session = await auth.api.getSession({
+      headers: headersList as any,
     });
     const userId = session?.user?.id;
 
@@ -115,7 +120,9 @@ export const getIdeas = cache(
         }
 
         // Ensure author is a single object, not an array
-        const author = Array.isArray(idea.author) ? idea.author[0] : idea.author;
+        const author = Array.isArray(idea.author)
+          ? idea.author[0]
+          : idea.author;
 
         return {
           ...idea,
@@ -144,9 +151,17 @@ export const getIdeas = cache(
 
 /**
  * Get a single idea by ID with full details
+ * Cached for optimal performance in server components
  */
-export const getIdeaById = cache(async (id: string) => {
+export const getIdeaById = cache(async (id: string): Promise<IdeaById> => {
   const supabase = await createClient();
+  
+  // Get current user from Better Auth session
+  const headersList = await headers();
+  const session = await auth.api.getSession({
+    headers: headersList as any,
+  });
+  const userId = session?.user?.id;
 
   const { data: idea, error } = await supabase
     .from("Ideas")
@@ -160,7 +175,7 @@ export const getIdeaById = cache(async (id: string) => {
       votesCount,
       createdAt,
       updatedAt,
-      author:User!Ideas_userId_fkey(
+      author:user!Ideas_userId_fkey(
         id,
         username,
         name,
@@ -176,5 +191,30 @@ export const getIdeaById = cache(async (id: string) => {
     throw new Error("Failed to fetch idea");
   }
 
-  return idea;
+  if (!idea) {
+    throw new Error("Idea not found");
+  }
+
+  // Ensure author is a single object, not an array
+  const author = Array.isArray(idea.author) ? idea.author[0] : idea.author;
+
+  // Get user's vote if authenticated
+  let userVote = null;
+  if (userId) {
+    const { data: vote } = await supabase
+      .from("Votes")
+      .select("type")
+      .eq("userId", userId)
+      .eq("ideaId", idea.id)
+      .maybeSingle();
+
+    userVote = vote;
+  }
+
+  return {
+    ...idea,
+    author,
+    userVote,
+    userVoteType: userVote, // Legacy field for backward compatibility
+  } as IdeaById;
 });
