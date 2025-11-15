@@ -10,6 +10,8 @@ import BackButton from "@/components/Shared/BackButton";
 import { notFound } from "next/navigation";
 import { useIdeaDetail } from "@/hooks/useIdeaDetail";
 import { IdeaDetailSkeleton } from "./IdeaDetailSkeleton";
+import CommentForm from "../comment/CommentForm";
+import CommentSection from "../comment/CommentSection";
 
 interface IdeaDetailClientProps {
   id: string;
@@ -85,9 +87,9 @@ export default function IdeaDetailClient({ id }: IdeaDetailClientProps) {
           </div>
         </main>
 
-        {/* <CommentForm ideaId={idea.id} /> */}
+        <CommentForm ideaId={idea.id} />
 
-        {/* <CommentsSection ideaId={idea.id} /> */}
+        <CommentSection ideaId={idea.id} />
       </div>
     </div>
   );
