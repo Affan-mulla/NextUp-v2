@@ -87,8 +87,6 @@ export default function IdeaDetailClient({ id }: IdeaDetailClientProps) {
           </div>
         </main>
 
-        <CommentForm ideaId={idea.id} />
-
         <CommentSection ideaId={idea.id} />
       </div>
     </div>
