@@ -54,7 +54,6 @@ export function SignupForm({
       {
         onError: (error) => {
           toast.error(`Sign-up failed: ${error.error.message}`);
-          console.log(error);
         },
         onSuccess: async () => {
           // Dynamically import to avoid bundling in initial load

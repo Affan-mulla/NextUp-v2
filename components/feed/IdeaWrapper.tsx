@@ -38,16 +38,9 @@ const IdeaWrapper = () => {
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
 
-    console.log("👁️ [IDEA_WRAPPER] Setting up Intersection Observer");
-
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          console.log("🔄 [IDEA_WRAPPER] Load more trigger intersected", {
-            hasNextPage,
-            isFetchingNextPage,
-          });
-          console.log("⬇️ [IDEA_WRAPPER] Fetching next page");
           fetchNextPage();
         }
       },
@@ -56,13 +49,11 @@ const IdeaWrapper = () => {
 
     const currentRef = loadMoreRef.current;
     if (currentRef) {
-      console.log("✅ [IDEA_WRAPPER] Observing load more element");
       observer.observe(currentRef);
     }
 
     return () => {
       if (currentRef) {
-        console.log("🗑️ [IDEA_WRAPPER] Cleaning up Intersection Observer");
         observer.unobserve(currentRef);
       }
     };

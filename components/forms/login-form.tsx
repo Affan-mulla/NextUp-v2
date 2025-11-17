@@ -56,7 +56,7 @@ export function LoginForm({
       {
         onError: (error) => {
           toast.error(`Sign-in failed: ${error.error.message}`);
-          console.log(error);
+         
         },
         onSuccess: async () => {
           // Dynamically import to avoid bundling in initial load

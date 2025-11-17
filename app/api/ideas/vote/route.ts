@@ -38,11 +38,6 @@ const VALID_VOTE_TYPES: VoteType[] = ["UP", "DOWN"];
 
 export async function POST(request: NextRequest) {
   try {
-    // ========================================================================
-    // Authentication Check
-    // ========================================================================
-    console.log("voteapi");
-    
     const session = await auth.api.getSession({
       headers: request.headers as any,
     });

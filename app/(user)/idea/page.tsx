@@ -3,16 +3,18 @@
 import { Suspense } from "react";
 import { CreateIdeaForm } from "@/components/forms/CreateIdeaForm";
 import { AuthGuard } from "@/components/auth/auth-guards";
+import { useRouter } from "next/navigation";
 
 /**
  * Create Idea Page
  * Uses the production-ready CreateIdeaForm component
  */
 export default function CreateIdeaPage() {
+
+  const router = useRouter();
   const handleSuccess = (ideaId: string) => {
-    // You can add custom logic here when an idea is created successfully
-    console.log("Idea created with ID:", ideaId);
     // Optionally redirect or show a success message
+    router.push(`/idea/${ideaId}`);
   };
 
   return (

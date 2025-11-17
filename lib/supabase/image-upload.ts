@@ -72,11 +72,8 @@ export async function uploadBase64ImagesToSupabase(
   const base64Images = extractBase64Images(editorContent);
 
   if (base64Images.length === 0) {
-    console.log("[uploadBase64ImagesToSupabase] No base64 images found");
     return imageMapping;
   }
-
-  console.log(`[uploadBase64ImagesToSupabase] Found ${base64Images.length} base64 images to upload`);
 
   try {
     // Use Promise.all() for concurrent uploads instead of sequential for loop
@@ -85,8 +82,6 @@ export async function uploadBase64ImagesToSupabase(
         const blob = base64ToBlob(image.base64, image.mimeType);
         const filename = generateImageFilename(image.mimeType);
         const path = `${userId}/editor/${filename}`;
-
-        console.log(`[uploadBase64ImagesToSupabase] Uploading: ${path}`);
 
         const { data: uploadData, error } = await supabase.storage
           .from(BUCKET_NAME)
@@ -112,9 +107,7 @@ export async function uploadBase64ImagesToSupabase(
           throw new Error(`Failed to get public URL for ${path}`);
         }
 
-        console.log(`[uploadBase64ImagesToSupabase] ✅ Uploaded successfully: ${urlData.publicUrl}`);
-
-        return {
+         return {
           base64: image.base64,
           supabaseUrl: urlData.publicUrl,
         };
@@ -133,7 +126,6 @@ export async function uploadBase64ImagesToSupabase(
       imageMapping.set(base64, supabaseUrl);
     });
 
-    console.log(`[uploadBase64ImagesToSupabase] ✅ All ${results.length} uploads completed`);
     return imageMapping;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : "Unknown error";
@@ -173,16 +165,12 @@ export async function uploadFilesToSupabase(
   const uploadedUrls: string[] = [];
 
   if (files.length === 0) {
-    console.log("[uploadFilesToSupabase] No files to upload");
     return uploadedUrls;
   }
 
   if (files.length > MAX_FILES) {
     throw new Error(`Maximum ${MAX_FILES} files allowed`);
   }
-
-  console.log(`[uploadFilesToSupabase] Starting upload of ${files.length} files`);
-
   try {
     // Validate all files first
     const validatedFiles = files.filter((file) => {
@@ -211,9 +199,7 @@ export async function uploadFilesToSupabase(
         const filename = generateImageFilename(file.type);
         const path = `${userId}/uploads/${filename}`;
 
-        console.log(`[uploadFilesToSupabase] Uploading: ${path}`);
-
-        const { data: uploadData, error } = await supabase.storage
+         const { data: uploadData, error } = await supabase.storage
           .from(BUCKET_NAME)
           .upload(path, file, {
             contentType: file.type,
@@ -236,9 +222,6 @@ export async function uploadFilesToSupabase(
         if (!urlData?.publicUrl) {
           throw new Error(`Failed to get public URL for ${file.name}`);
         }
-
-        console.log(`[uploadFilesToSupabase] ✅ Uploaded: ${file.name} -> ${urlData.publicUrl}`);
-
         return urlData.publicUrl;
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : "Unknown error";
@@ -249,8 +232,6 @@ export async function uploadFilesToSupabase(
 
     // Wait for ALL uploads to complete before proceeding
     const results = await Promise.all(uploadPromises);
-
-    console.log(`[uploadFilesToSupabase] ✅ All ${results.length} file uploads completed`);
 
     return results;
   } catch (error) {

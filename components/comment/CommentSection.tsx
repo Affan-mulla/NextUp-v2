@@ -26,8 +26,6 @@ export default function CommentSection({
     fetchNextPage,
   } = useComments(ideaId);
 
-  console.log("Initial Comments:", data);
-
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Intersection Observer for infinite scroll

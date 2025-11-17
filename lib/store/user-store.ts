@@ -189,13 +189,6 @@ export const useUserStore = create<UserStore>()(
         // This is called AFTER persist middleware reads from sessionStorage
         if (state) {
           state.isHydrated = true;
-          // Log rehydration in development
-          if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-            console.log("💾 Store rehydrated from sessionStorage:", {
-              user: state.user?.email || null,
-              isAuthenticated: state.isAuthenticated
-            })
-          }
         }
       },
     }

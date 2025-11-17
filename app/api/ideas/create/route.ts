@@ -36,8 +36,6 @@ interface CreateIdeaRequest {
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log("[POST /api/ideas/create] Starting idea creation flow...");
-
     // ============================================================
     // STEP 1: Validate Authentication
     // ============================================================
@@ -52,7 +50,6 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    console.log(`[POST /api/ideas/create] ✅ Authenticated user: ${userId}`);
 
     // ============================================================
     // STEP 2: Parse and Validate Input
@@ -87,7 +84,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[POST /api/ideas/create] ✅ Input validation passed: "${titleTrimmed}"`);
 
     // ============================================================
     // STEP 3: Parse Description
@@ -107,12 +103,10 @@ export async function POST(request: NextRequest) {
     }
 
     let descriptionString = JSON.stringify(descriptionJson);
-    console.log(`[POST /api/ideas/create] ✅ Description parsed (length: ${descriptionString.length})`);
 
     // ============================================================
     // STEP 4: Upload Base64 Images from Editor
     // ============================================================
-    console.log("[POST /api/ideas/create] Starting base64 image extraction and upload...");
     let base64ImageMapping: Map<string, string>;
     
     try {
@@ -120,7 +114,6 @@ export async function POST(request: NextRequest) {
         descriptionString,
         userId
       );
-      console.log(`[POST /api/ideas/create] ✅ Base64 upload complete: ${base64ImageMapping.size} images`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
       console.error("[POST /api/ideas/create] ❌ Base64 upload failed:", errorMsg);
@@ -134,13 +127,11 @@ export async function POST(request: NextRequest) {
     // STEP 5: Replace Base64 URLs with Supabase URLs
     // ============================================================
     if (base64ImageMapping.size > 0) {
-      console.log("[POST /api/ideas/create] Replacing base64 URLs with Supabase URLs...");
       try {
         descriptionString = replaceBase64WithSupabaseUrls(
           descriptionString,
           base64ImageMapping
         );
-        console.log("[POST /api/ideas/create] ✅ Base64 URLs replaced");
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : "Unknown error";
         console.error("[POST /api/ideas/create] ❌ URL replacement failed:", errorMsg);
@@ -160,15 +151,12 @@ export async function POST(request: NextRequest) {
     // by the client before sending this request. This is just for reference.
     // The uploadedImageUrls array contains the final Supabase public URLs.
     
-    console.log(`[POST /api/ideas/create] ✅ Manually uploaded images: ${finalUploadedImages.length}`);
-
     // ============================================================
     // STEP 7: Parse Updated Description
     // ============================================================
     let finalDescription: any;
     try {
       finalDescription = JSON.parse(descriptionString);
-      console.log("[POST /api/ideas/create] ✅ Final description prepared");
     } catch (error) {
       console.error("[POST /api/ideas/create] ❌ Failed to parse final description:", error);
       return NextResponse.json(
@@ -181,8 +169,7 @@ export async function POST(request: NextRequest) {
     // STEP 8: CREATE IDEA IN DATABASE
     // ============================================================
     // CRITICAL: Only insert AFTER all uploads have completed and URLs replaced
-    console.log("[POST /api/ideas/create] All uploads complete. Inserting into database...");
-
+ 
     let idea;
     try {
       idea = await prisma.ideas.create({
@@ -205,7 +192,6 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(`[POST /api/ideas/create] ✅ Idea created successfully: ${idea.id}`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
       console.error("[POST /api/ideas/create] ❌ Database insert failed:", errorMsg);
@@ -214,11 +200,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // ============================================================
-    // STEP 9: Return Success
-    // ============================================================
-    console.log("[POST /api/ideas/create] ✅ Idea creation workflow complete");
 
     return NextResponse.json(
       {

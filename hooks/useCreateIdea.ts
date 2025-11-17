@@ -85,12 +85,10 @@ export const useCreateIdea = () => {
       }
 
       try {
-        console.log("[useCreateIdea] Starting idea creation workflow...");
 
         // ============================================================
         // STEP 1: Check authentication
         // ============================================================
-        console.log("[useCreateIdea] Checking authentication...");
         const { data: session } = await authClient.getSession();
         if (!session?.user) {
           const errMsg = "Please log in to create ideas";
@@ -98,8 +96,6 @@ export const useCreateIdea = () => {
           toast.error(errMsg);
           return { success: false, error: "User not authenticated" };
         }
-        console.log(`[useCreateIdea] ✅ Authenticated: ${session.user.id}`);
-
         // ============================================================
         // STEP 2: Upload manually selected images
         // ============================================================
@@ -111,8 +107,7 @@ export const useCreateIdea = () => {
 
         let uploadedImageUrls: string[] = [];
         if (payload.uploadedImages.length > 0) {
-          console.log(`[useCreateIdea] Uploading ${payload.uploadedImages.length} image files...`);
-          setState((prev) => ({
+            setState((prev) => ({
             ...prev,
             isUploadingImages: true,
           }));
@@ -128,8 +123,7 @@ export const useCreateIdea = () => {
               payload.uploadedImages,
               session.user.id
             );
-            console.log(`[useCreateIdea] ✅ Image upload complete: ${uploadedImageUrls.length} URLs`);
-            toast.dismiss(toastId);
+           toast.dismiss(toastId);
           } catch (error) {
             toast.dismiss(toastId);
             const errorMsg =
@@ -157,7 +151,6 @@ export const useCreateIdea = () => {
         // ============================================================
         // STEP 3: Update progress and send to API
         // ============================================================
-        console.log("[useCreateIdea] All image uploads complete. Submitting to API...");
         setState((prev) => ({
           ...prev,
           progress: { current: 2, total: 3, stage: "submitting" },
@@ -173,12 +166,6 @@ export const useCreateIdea = () => {
           uploadedImageUrls,
         };
 
-        console.log("[useCreateIdea] Sending request to API:", {
-          title: requestPayload.title,
-          descriptionLength: requestPayload.description.length,
-          uploadedImageCount: uploadedImageUrls.length,
-        });
-
         const { data } = await axios.post<CreateIdeaResponse>(
           "/api/ideas/create",
           requestPayload,
@@ -189,8 +176,7 @@ export const useCreateIdea = () => {
           }
         );
 
-        console.log("[useCreateIdea] ✅ API response success:", data);
-
+       
         // ============================================================
         // STEP 4: Complete and notify
         // ============================================================
@@ -201,9 +187,6 @@ export const useCreateIdea = () => {
 
         toast.dismiss(toastId);
         toast.success(data.message || "Idea created successfully! 🎉");
-
-        console.log("[useCreateIdea] ✅ Idea creation complete!");
-
         // Reset state after a short delay
         setTimeout(() => {
           setState((prev) => ({

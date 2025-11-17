@@ -43,7 +43,6 @@ export function SessionProvider({
     staleTime: 1000 * 60 * 5, // 5 minutes
     onSuccess: (user) => {
       if (debugRef.current) {
-        console.log("🔄 onSuccess callback - hydrating with:", user)
       }
       hydrateFromSession(user)
       setLoading(false)
