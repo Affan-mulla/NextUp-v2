@@ -42,6 +42,7 @@ export default function VotesButton({
   initialVotesCount,
   initialUserVote,
   size = "md",
+  disabled = false,
 }: VotesButtonProps) {
   const [localVote, setLocalVote] = useState<VoteType | null>(
     initialUserVote || null
@@ -52,6 +53,7 @@ export default function VotesButton({
 
   const handleVoteClick = useCallback(
     (voteType: VoteType) => {
+      if (disabled) return;
       // Determine new vote state
       const newVote = localVote === voteType ? null : voteType;
       
@@ -83,7 +85,7 @@ export default function VotesButton({
         }
       );
     },
-    [commentId, localVote, localCount, voteCommentMutation]
+    [commentId, localVote, localCount, voteCommentMutation, disabled]
   );
 
   // Debounced version (optional, for network optimization)
@@ -103,7 +105,7 @@ export default function VotesButton({
             : "hover:text-green-600"
         )}
         onClick={() => handleVoteClick("UP")}
-        disabled={voteCommentMutation.isPending}
+        disabled={voteCommentMutation.isPending || disabled}
         aria-label="Upvote"
       >
         <ArrowBigUpDash
@@ -135,7 +137,7 @@ export default function VotesButton({
             : "hover:text-orange-600"
         )}
         onClick={() => handleVoteClick("DOWN")}
-        disabled={voteCommentMutation.isPending}
+        disabled={voteCommentMutation.isPending || disabled}
         aria-label="Downvote"
       >
         <ArrowBigDownDash

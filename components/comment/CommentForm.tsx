@@ -28,7 +28,7 @@ export default function CommentForm({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
-  const avatar = useUserField("image");
+  const avatar = useUserField("avatar");
   const username = useUserField("name");
 
   const {
@@ -120,7 +120,7 @@ export default function CommentForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit(onSubmit)}
-      className={parentId ? "mt-2" : "mt-4"}
+      className={parentId ? "mt-2 ml-8" : "mt-4"}
     >
       <div
         className={`rounded-2xl ${
@@ -131,13 +131,10 @@ export default function CommentForm({
       >
         <div className="flex items-start w-full gap-3 px-3 py-3">
           <Avatar className="h-8 w-8 shrink-0 mt-1">
-            {avatar ? (
               <AvatarImage src={avatar} alt={username || "User"} className="object-cover" />
-            ) : (
               <AvatarFallback>
                 <User className="w-4 h-4 text-muted-foreground" />
               </AvatarFallback>
-            )}
           </Avatar>
 
           <div className="flex-1 min-w-0">

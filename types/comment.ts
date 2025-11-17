@@ -81,6 +81,30 @@ export interface VoteCommentResponse {
   message: string;
 }
 
+// Edit comment request
+export interface EditCommentRequest {
+  commentId: string;
+  content: string;
+}
+
+// Edit comment response
+export interface EditCommentResponse {
+  success: boolean;
+  comment: Comment;
+  message: string;
+}
+
+// Delete comment request
+export interface DeleteCommentRequest {
+  commentId: string;
+}
+
+// Delete comment response
+export interface DeleteCommentResponse {
+  success: boolean;
+  message: string;
+}
+
 // Error response
 export interface ErrorResponse {
   error: string;
@@ -131,6 +155,7 @@ export interface VotesButtonProps {
   initialVotesCount: number;
   initialUserVote?: VoteType | null;
   size?: "sm" | "md" | "lg";
+  disabled?: boolean;
 }
 
 export interface CommentSectionProps {

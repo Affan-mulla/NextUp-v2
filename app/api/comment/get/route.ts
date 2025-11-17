@@ -41,7 +41,17 @@ export async function GET(request: NextRequest) {
       where: {
         ideaId,
         commentId: null, // Only top-level comments
-        isDeleted: false,
+        OR :[
+          {
+            isDeleted: false,
+          },
+          {
+            AND : [
+              { isDeleted: true },
+              { replies : { some: {} } }
+            ]
+          }
+        ]
       },
       take: limit + 1, // Fetch one extra to determine if there are more
       ...(cursor && {

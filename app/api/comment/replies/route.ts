@@ -53,7 +53,19 @@ export async function GET(request: NextRequest) {
     const replies = await prisma.comments.findMany({
       where: {
         commentId,
-        isDeleted: false,
+        OR :[
+          {
+            isDeleted: false,
+          },
+          {
+            AND : [
+              {
+                isDeleted: true,
+              },
+              { replies : { some: {} } }
+            ]
+          }
+        ],
       },
       take: limit + 1, // Fetch one extra to determine if there are more
       ...(cursor && {

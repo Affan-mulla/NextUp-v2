@@ -22,6 +22,10 @@ import type {
   ReplyListResponse,
   VoteCommentRequest,
   VoteCommentResponse,
+  EditCommentRequest,
+  EditCommentResponse,
+  DeleteCommentRequest,
+  DeleteCommentResponse,
 } from "@/types/comment";
 
 const COMMENTS_PER_PAGE = 20;
@@ -466,4 +470,210 @@ export function usePrefetchReplies() {
       staleTime: 1000 * 60 * 5,
     });
   };
+}
+
+// ============================================================================
+// Edit Comment Mutation
+// ============================================================================
+
+async function editComment(
+  data: EditCommentRequest
+): Promise<EditCommentResponse> {
+  const { data: responseData } = await axios.patch<EditCommentResponse>(
+    "/api/comment/edit",
+    data
+  );
+  return responseData;
+}
+
+export function useEditComment(ideaId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: editComment,
+    
+    // Optimistic update
+    onMutate: async ({ commentId, content }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: commentKeys.list(ideaId),
+      });
+
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData<
+        InfiniteData<CommentListResponse>
+      >(commentKeys.list(ideaId));
+
+      // Optimistically update main comments cache
+      queryClient.setQueryData<InfiniteData<CommentListResponse>>(
+        commentKeys.list(ideaId),
+        (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              comments: page.comments.map((comment) =>
+                comment.id === commentId
+                  ? { ...comment, content }
+                  : comment
+              ),
+            })),
+          };
+        }
+      );
+
+      // Also update replies cache if this is a reply
+      const allRepliesQueries = queryClient.getQueriesData<ReplyListResponse>({
+        queryKey: commentKeys.all,
+      });
+
+      allRepliesQueries.forEach(([queryKey, data]) => {
+        if (data && 'replies' in data) {
+          queryClient.setQueryData<ReplyListResponse>(queryKey, {
+            ...data,
+            replies: data.replies.map((reply) =>
+              reply.id === commentId
+                ? { ...reply, content }
+                : reply
+            ),
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          commentKeys.list(ideaId),
+          context.previousData
+        );
+      }
+
+      const errorMessage =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to edit comment"
+          : "Failed to edit comment";
+      
+      toast.error(errorMessage);
+    },
+
+    onSuccess: (data) => {
+      toast.success(data.message || "Comment updated successfully!");
+    },
+
+    // Settle queries after mutation
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: commentKeys.list(ideaId),
+      });
+    },
+  });
+}
+
+// ============================================================================
+// Delete Comment Mutation
+// ============================================================================
+
+async function deleteComment(
+  data: DeleteCommentRequest
+): Promise<DeleteCommentResponse> {
+  const { data: responseData } = await axios.delete<DeleteCommentResponse>(
+    "/api/comment/delete",
+    { data }
+  );
+  return responseData;
+}
+
+export function useDeleteComment(ideaId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteComment,
+    
+    // Optimistic update
+    onMutate: async ({ commentId }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: commentKeys.list(ideaId),
+      });
+
+      // Snapshot previous value
+      const previousData = queryClient.getQueryData<
+        InfiniteData<CommentListResponse>
+      >(commentKeys.list(ideaId));
+
+      // Optimistically update main comments cache
+      queryClient.setQueryData<InfiniteData<CommentListResponse>>(
+        commentKeys.list(ideaId),
+        (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              comments: page.comments.map((comment) =>
+                comment.id === commentId
+                  ? { ...comment, isDeleted: true, content: "[deleted]" }
+                  : comment
+              ),
+            })),
+          };
+        }
+      );
+
+      // Also update replies cache if this is a reply
+      const allRepliesQueries = queryClient.getQueriesData<ReplyListResponse>({
+        queryKey: commentKeys.all,
+      });
+
+      allRepliesQueries.forEach(([queryKey, data]) => {
+        if (data && 'replies' in data) {
+          queryClient.setQueryData<ReplyListResponse>(queryKey, {
+            ...data,
+            replies: data.replies.map((reply) =>
+              reply.id === commentId
+                ? { ...reply, isDeleted: true, content: "[deleted]" }
+                : reply
+            ),
+          });
+        }
+      });
+
+      return { previousData };
+    },
+
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          commentKeys.list(ideaId),
+          context.previousData
+        );
+      }
+
+      const errorMessage =
+        error instanceof AxiosError
+          ? error.response?.data?.message || "Failed to delete comment"
+          : "Failed to delete comment";
+      
+      toast.error(errorMessage);
+    },
+
+    onSuccess: (data) => {
+      toast.success(data.message || "Comment deleted successfully!");
+    },
+
+    // Settle queries after mutation
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: commentKeys.list(ideaId),
+      });
+    },
+  });
 }
