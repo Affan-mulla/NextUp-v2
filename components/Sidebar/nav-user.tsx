@@ -34,7 +34,8 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
-import { useUser, useUserActions } from "@/lib/store/user-store"
+import { useUser, useUserActions, useIsHydrated, useIsLoading } from "@/lib/store/user-store"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -44,8 +45,24 @@ export function NavUser() {
   // Get user from Zustand store
   const user = useUser()
   const { clearUser } = useUserActions()
+  const isHydrated = useIsHydrated()
+  const isLoading = useIsLoading()
   
-  // Fallback if no user in store
+  // Show loading skeleton while hydrating
+  if (!isHydrated || isLoading) {
+    return (
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+
+          </div>
+    )
+  }
+  
+  // Show nothing if no user after hydration
   if (!user) {
     return null
   }

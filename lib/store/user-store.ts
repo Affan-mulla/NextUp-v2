@@ -82,9 +82,15 @@ type UserStore = UserState & UserActions;
 
 /**
  * User store with persist middleware
- * - Stores user state in localStorage for session persistence
+ * - Stores user state in sessionStorage for session persistence
  * - Uses 'user-storage' as the storage key
  * - Automatically rehydrates state on app load
+ * 
+ * Key behaviors:
+ * - On app load, persist middleware reads from sessionStorage and hydrates the store
+ * - onRehydrateStorage runs AFTER persist reads from storage
+ * - isHydrated flag is set to true when rehydration completes
+ * - SessionProvider waits for isHydrated=true before fetching session
  */
 export const useUserStore = create<UserStore>()(
   persist(
@@ -171,17 +177,18 @@ export const useUserStore = create<UserStore>()(
         }),
     }),
     {
-      name: 'user-storage', // localStorage key
+      name: 'user-storage', // sessionStorage key
       storage: createJSONStorage(() => sessionStorage), // Use sessionStorage for better security
       partialize: (state) => ({
         // Only persist user data, not loading/hydration flags
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, action) => {
         // Mark as hydrated after rehydration completes
+        // This is called AFTER persist middleware reads from sessionStorage
         if (state) {
-          state.setHydrated();
+          state.isHydrated = true;
         }
       },
     }
