@@ -29,6 +29,11 @@ const layout = async({ children }: { children: React.ReactNode }) => {
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
             </div>
+            {/* Search bar goes here */}
+            <div>
+              
+            </div>
+
             <div className="mr-4">
               <Link
                 href="/idea"
@@ -47,7 +52,7 @@ const layout = async({ children }: { children: React.ReactNode }) => {
                 />
                 <p className="hidden md:block">Create</p>
               </Link>
-            </div>
+            </div>  
           </header>
           <ScrollArea className="h-[calc(100vh-4rem)]">
           <Suspense fallback={<IdeaFeedSkeleton/>}>

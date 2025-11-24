@@ -32,7 +32,7 @@ const Page = async () => {
  
   return (
     <ScrollArea className="h-full max-h-[calc(100vh-4rem)]">
-    <div className="md:mx-20 lg:mx-30 my-10 px-4">
+    <div className="">
       {/* Hydrate the client with server-fetched data */}
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="space-y-6">

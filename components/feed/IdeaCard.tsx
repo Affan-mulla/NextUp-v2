@@ -78,8 +78,8 @@ const IdeaCard = ({
 
   return (
     <div className="">
-      <Card className="bg-background py-3  border-border shadow-md hover:shadow-lg transition-all duration-200 rounded-2xl hover:bg-card/20 cursor-pointer"
-        onClick={() => {
+      <Card className="bg-background py-3 border-0 rounded-none transition-all duration-200 hover:bg-accent/30 cursor-pointer"
+        onClick={() => {  
           router.push(`/idea/${id}`);
         }}
       >

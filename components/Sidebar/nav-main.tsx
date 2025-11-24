@@ -47,7 +47,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                   className={
                     `flex w-full  items-center  px-3 py-2 rounded-md text-sm transition-colors duration-150  ` +
                     (isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm dark:border-x-0 dark:border-b-0 border'
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm dark:border-x-0 dark:border-b-2 dark:border-b-background/80 border'
                       : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground')
                   }
                 >
