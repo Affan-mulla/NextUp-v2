@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { IdeaFeedSkeleton } from "@/components/feed/IdeaCardSkeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { UnifiedSearchBar } from "@/components/search/UnifiedSearchBar";
 
 const layout = async({ children }: { children: React.ReactNode }) => {
   "use cache";
@@ -29,9 +30,8 @@ const layout = async({ children }: { children: React.ReactNode }) => {
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
             </div>
-            {/* Search bar goes here */}
-            <div>
-              
+            <div className="flex-1 max-w-xl w-full">
+              <UnifiedSearchBar />
             </div>
 
             <div className="mr-4">

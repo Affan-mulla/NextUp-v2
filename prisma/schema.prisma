@@ -29,6 +29,8 @@ model User {
   sessions      Session[]
 
   @@map("user")
+  @@index([username])
+  @@index([email])
 }
 
 model Product {
@@ -51,6 +53,8 @@ model Product {
   subscriptions Subscriptions[]
 
   @@map("product")
+  @@index([name])
+  @@index([description])
 }
 
 model Membership {
