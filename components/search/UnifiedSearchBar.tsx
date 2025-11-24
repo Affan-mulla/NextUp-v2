@@ -186,9 +186,9 @@ export const UnifiedSearchBar: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-md"
+      className="relative w-full max-w-md border-4 dark:border-foreground/10 border-primary/15 rounded-[14.5px]"
     >
-        
+
       <Input
         ref={inputRef}
         placeholder="Search users or products…"
@@ -196,7 +196,7 @@ export const UnifiedSearchBar: React.FC = () => {
         onChange={handleChange}
         onFocus={() => query && setIsOpen(true)}
         onKeyDown={handleKeyDown}
-        className="bg-background/80 text-foreground border-border h-10 rounded-lg backdrop-blur-md"
+        className="bg-background/80 text-foreground h-10 rounded-lg border-2    focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
       />
 
       <AnimatePresence>
@@ -206,7 +206,7 @@ export const UnifiedSearchBar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-border bg-background/90 backdrop-blur-xl shadow-none"
+            className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-border bg-background/30 backdrop-blur-xl shadow-none"
           >
             <ScrollArea className="max-h-80 rounded-lg">
               <div className="p-2 text-sm">
