@@ -83,7 +83,7 @@ const IdeaWrapper = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 divide-y divide-muted">
       {/* 
         Render each idea card with isolated voting state
         Each card manages its own optimistic updates

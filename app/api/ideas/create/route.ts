@@ -11,6 +11,7 @@ import {
   uploadFilesToSupabase,
   replaceBase64WithSupabaseUrls,
 } from "@/lib/supabase/image-upload";
+import { extractUploadAndRemoveImages } from "@/lib/utils/lexical-image-extractor";
 import { auth } from "@/lib/auth/auth";
 
 // Type for the request body
@@ -105,60 +106,43 @@ export async function POST(request: NextRequest) {
     let descriptionString = JSON.stringify(descriptionJson);
 
     // ============================================================
-    // STEP 4: Upload Base64 Images from Editor
+    // STEP 4: Extract, Upload, and Remove Images from Lexical JSON
     // ============================================================
-    let base64ImageMapping: Map<string, string>;
+    let extractedImageUrls: string[] = [];
+    let cleanedDescriptionString: string;
     
     try {
-      base64ImageMapping = await uploadBase64ImagesToSupabase(
-        descriptionString,
-        userId
-      );
+      const result = await extractUploadAndRemoveImages(descriptionString, userId);
+      extractedImageUrls = result.imageUrls;
+      cleanedDescriptionString = result.cleanedDescriptionString;
+      
+      console.log(`[POST /api/ideas/create] ✅ Extracted and uploaded ${extractedImageUrls.length} images from editor`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      console.error("[POST /api/ideas/create] ❌ Base64 upload failed:", errorMsg);
+      console.error("[POST /api/ideas/create] ❌ Image extraction failed:", errorMsg);
       return NextResponse.json(
-        { error: `Failed to upload editor images: ${errorMsg}` },
+        { error: `Failed to process editor images: ${errorMsg}` },
         { status: 500 }
       );
     }
 
     // ============================================================
-    // STEP 5: Replace Base64 URLs with Supabase URLs
+    // STEP 5: Combine All Uploaded Images
     // ============================================================
-    if (base64ImageMapping.size > 0) {
-      try {
-        descriptionString = replaceBase64WithSupabaseUrls(
-          descriptionString,
-          base64ImageMapping
-        );
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : "Unknown error";
-        console.error("[POST /api/ideas/create] ❌ URL replacement failed:", errorMsg);
-        return NextResponse.json(
-          { error: `Failed to process editor images: ${errorMsg}` },
-          { status: 500 }
-        );
-      }
-    }
-
-    // ============================================================
-    // STEP 6: Handle Manually Uploaded Files
-    // ============================================================
-    let finalUploadedImages: string[] = body.uploadedImageUrls || [];
+    // Merge extracted images from editor with manually uploaded files
+    const manuallyUploadedImages = body.uploadedImageUrls || [];
+    const finalUploadedImages = [...extractedImageUrls, ...manuallyUploadedImages];
     
-    // Note: Manually uploaded images should already be uploaded to Supabase
-    // by the client before sending this request. This is just for reference.
-    // The uploadedImageUrls array contains the final Supabase public URLs.
+    console.log(`[POST /api/ideas/create] 📸 Total images: ${finalUploadedImages.length} (${extractedImageUrls.length} from editor, ${manuallyUploadedImages.length} manual uploads)`);
     
     // ============================================================
-    // STEP 7: Parse Updated Description
+    // STEP 6: Parse Cleaned Description
     // ============================================================
     let finalDescription: any;
     try {
-      finalDescription = JSON.parse(descriptionString);
+      finalDescription = JSON.parse(cleanedDescriptionString);
     } catch (error) {
-      console.error("[POST /api/ideas/create] ❌ Failed to parse final description:", error);
+      console.error("[POST /api/ideas/create] ❌ Failed to parse cleaned description:", error);
       return NextResponse.json(
         { error: "Failed to finalize description" },
         { status: 500 }
@@ -166,9 +150,9 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================================
-    // STEP 8: CREATE IDEA IN DATABASE
+    // STEP 7: CREATE IDEA IN DATABASE
     // ============================================================
-    // CRITICAL: Only insert AFTER all uploads have completed and URLs replaced
+    // CRITICAL: Only insert AFTER all uploads have completed and images removed from Lexical JSON
  
     let idea;
     try {

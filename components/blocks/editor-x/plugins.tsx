@@ -45,6 +45,7 @@ import { EmojisPlugin } from "@/components/editor/plugins/emojis-plugin"
 import { FloatingLinkEditorPlugin } from "@/components/editor/plugins/floating-link-editor-plugin"
 import { FloatingTextFormatToolbarPlugin } from "@/components/editor/plugins/floating-text-format-plugin"
 import { ImagesPlugin } from "@/components/editor/plugins/images-plugin"
+import { SingleImageEnforcerPlugin } from "@/components/editor/plugins/single-image-enforcer-plugin"
 import { KeywordsPlugin } from "@/components/editor/plugins/keywords-plugin"
 import { LayoutPlugin } from "@/components/editor/plugins/layout-plugin"
 import { LinkPlugin } from "@/components/editor/plugins/link-plugin"
@@ -187,6 +188,7 @@ export function Plugins({}) {
         <KeywordsPlugin />
         <EmojisPlugin />
         <ImagesPlugin />
+        <SingleImageEnforcerPlugin maxImages={1} />
 
         <LayoutPlugin />
 

@@ -11,3 +11,11 @@ export interface LexicalJsonNode {
 export interface LexicalEditorState {
   root: LexicalJsonNode
 }
+
+/**
+ * Result from extractUploadAndRemoveImages utility
+ */
+export interface ImageExtractionResult {
+  imageUrls: string[]
+  cleanedDescriptionString: string
+}

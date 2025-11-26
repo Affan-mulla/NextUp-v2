@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { IdeaFeedSkeleton } from "@/components/feed/IdeaCardSkeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { UnifiedSearchBar } from "@/components/search/UnifiedSearchBar";
 
 const layout = async({ children }: { children: React.ReactNode }) => {
   "use cache";
@@ -29,6 +30,10 @@ const layout = async({ children }: { children: React.ReactNode }) => {
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
             </div>
+            <div className="flex-1 max-w-xl w-full">
+              <UnifiedSearchBar />
+            </div>
+
             <div className="mr-4">
               <Link
                 href="/idea"
@@ -47,7 +52,7 @@ const layout = async({ children }: { children: React.ReactNode }) => {
                 />
                 <p className="hidden md:block">Create</p>
               </Link>
-            </div>
+            </div>  
           </header>
           <ScrollArea className="h-[calc(100vh-4rem)]">
           <Suspense fallback={<IdeaFeedSkeleton/>}>

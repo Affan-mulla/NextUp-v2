@@ -8,7 +8,7 @@ const BackButton = () => {
   const router = useRouter();
   return (
     <Button variant={"ghost"} size={"icon"} onClick={() => router.back()}>
-      <HugeiconsIcon icon={ArrowLeft02Icon} />
+      <HugeiconsIcon icon={ArrowLeft02Icon} className="size-6" />
     </Button>
   );
 };
