@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { debounce } from "@/utils/debounce"
 import { cn } from "@/lib/utils"
+import axios from "axios"
 
 interface SearchUser {
   id: string
@@ -79,11 +80,8 @@ export const UnifiedSearchBar: React.FC = () => {
         }
 
         try {
-          const res = await fetch(`/api/search?q=${encodeURIComponent(value)}`, {
-            method: "GET",
-          })
-          if (!res.ok) throw new Error("Failed to search")
-          const json = (await res.json()) as SearchResponse
+          const res = await axios.get(`/api/search?q=${encodeURIComponent(value)}`)
+          const json = res.data as SearchResponse
           setResults(json)
         } catch (error) {
           console.error(error)

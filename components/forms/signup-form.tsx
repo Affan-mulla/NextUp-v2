@@ -49,27 +49,18 @@ export function SignupForm({
         email: data.email,
         name: data.name,
         password: data.password,
-        callbackURL: "/",
+        callbackURL: "/verify-email",
       },
       {
         onError: (error) => {
           toast.error(`Sign-up failed: ${error.error.message}`);
         },
         onSuccess: async () => {
-          // Dynamically import to avoid bundling in initial load
-          const { fetchSessionUser } = await import("@/lib/auth/session-utils");
-          const user = await fetchSessionUser();
-          
-          if (user) {
-            hydrateFromSession(user);
-            // Invalidate the session query cache so SessionProvider fetches latest
-            await invalidateSession();
-          }
-          
           reset();
           toast.success(
-            "Sign-up successful! Welcome to NextUp!"
+            "Account created! Please check your email to verify your account."
           );
+          window.location.href = `/verify-email?email=${encodeURIComponent(data.email)}&message=check-email`;
         },
       }
     );
