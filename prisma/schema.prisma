@@ -1,343 +1,354 @@
-  generator client {
-    provider = "prisma-client-js"
-  }
+generator client {
+  provider = "prisma-client-js"
+}
 
-  datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
-  }
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
-  model User {
-    id            String          @id @default(cuid())
-    email         String          @unique
-    username      String          @unique
-    name          String
-    createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @default(now()) @updatedAt
-    image         String?
-    emailVerified Boolean         @default(false)
-    commentVotes  CommentVotes[]
-    comments      Comments[]
-    feedbacks     Feedback[]
-    follows       Follows[]
-    ideas         Ideas[]
-    memberships   Membership[]
-    notifications Notifications[]
-    votes         Votes[]
-    accounts      Account[]
-    sessions      Session[]
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  username      String          @unique
+  name          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  image         String?
+  emailVerified Boolean         @default(false)
+  commentVotes  CommentVotes[]
+  comments      Comments[]
+  feedbacks     Feedback[]
+  follows       Follows[]
+  ideas         Ideas[]
+  memberships   Membership[]
+  notifications Notifications[]
+  votes         Votes[]
+  accounts      Account[]
+  sessions      Session[]
 
-    @@map("user")
-    @@index([username])
-    @@index([email])
-  }
+  @@index([username])
+  @@index([email])
+  @@map("user")
+}
 
-  model Product {
-    id            String          @id @default(cuid())
-    name          String          @unique
-    slug          String          @unique
-    logoUrl       String?
-    description   String?
-    websiteUrl    String?
-    githubUrl     String?
-    images        String[]
-    createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @default(now()) @updatedAt
-    feedbacks     Feedback[]
-    followers     Follows[]
-    launches      Launch[]
-    leaderboard   Leaderboard[]
-    memberships   Membership[]
-    posts         Post[]
-    subscriptions Subscriptions[]
+model Product {
+  id            String          @id @default(cuid())
+  name          String          @unique
+  slug          String          @unique
+  logoUrl       String?
+  description   String?
+  websiteUrl    String?
+  githubUrl     String?
+  images        String[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  feedbacks     Feedback[]
+  followers     Follows[]
+  launches      Launch[]
+  leaderboard   Leaderboard[]
+  memberships   Membership[]
+  posts         Post[]
+  subscriptions Subscriptions[]
 
-    @@map("product")
-    @@index([name])
-    @@index([description])
-  }
+  @@index([name])
+  @@index([description])
+  @@map("product")
+}
 
-  model Membership {
-    id        String         @id @default(cuid())
-    userId    String
-    productId String
-    role      MembershipRole @default(MEMBER)
-    joinedAt  DateTime       @default(now())
-    product   Product        @relation(fields: [productId], references: [id])
-    user      User           @relation(fields: [userId], references: [id])
+model Membership {
+  id        String         @id @default(cuid())
+  userId    String
+  productId String
+  role      MembershipRole @default(MEMBER)
+  joinedAt  DateTime       @default(now())
+  product   Product        @relation(fields: [productId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
 
-    @@unique([userId, productId])
-  }
+  @@unique([userId, productId])
+}
 
-  model Post {
-    id        String     @id @default(cuid())
-    productId String
-    title     String
-    content   String?
-    type      PostType   @default(GENERAL)
-    createdAt DateTime   @default(now())
-    comments  Comments[]
-    product   Product    @relation(fields: [productId], references: [id])
-    votes     Votes[]
-  }
+model Post {
+  id        String     @id @default(cuid())
+  productId String
+  title     String
+  content   String?
+  type      PostType   @default(GENERAL)
+  createdAt DateTime   @default(now())
+  comments  Comments[]
+  product   Product    @relation(fields: [productId], references: [id])
+  votes     Votes[]
+}
 
-  model Ideas {
-    id             String     @id @default(cuid())
-    title          String
-    description    Json
-    userId         String
-    votesCount     Int        @default(0)
-    createdAt      DateTime   @default(now())
-    uploadedImages String[]   @default([])
-    updatedAt      DateTime   @default(now()) @updatedAt
-    comments       Comments[]
-    author         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    votes          Votes[]
+model Ideas {
+  id             String     @id @default(cuid())
+  title          String
+  description    Json
+  userId         String
+  votesCount     Int        @default(0)
+  createdAt      DateTime   @default(now())
+  uploadedImages String[]   @default([])
+  updatedAt      DateTime   @default(now()) @updatedAt
+  comments       Comments[]
+  author         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes          Votes[]
 
-    @@index([userId])
-    @@index([createdAt(sort: Desc)])
-  }
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+}
 
-  model Comments {
-    id         String         @id @default(cuid())
-    content    String
-    userId     String
-    ideaId     String?
-    postId     String?
-    commentId  String?
-    votesCount Int            @default(0)
-    isDeleted  Boolean        @default(false)
-    createdAt  DateTime       @default(now())
-    votes      CommentVotes[]
-    parent     Comments?      @relation("CommentReplies", fields: [commentId], references: [id])
-    replies    Comments[]     @relation("CommentReplies")
-    idea       Ideas?         @relation(fields: [ideaId], references: [id])
-    post       Post?          @relation(fields: [postId], references: [id])
-    user       User           @relation(fields: [userId], references: [id])
-  }
+model Comments {
+  id         String         @id @default(cuid())
+  content    String
+  userId     String
+  ideaId     String?
+  postId     String?
+  commentId  String?
+  votesCount Int            @default(0)
+  isDeleted  Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  votes      CommentVotes[]
+  parent     Comments?      @relation("CommentReplies", fields: [commentId], references: [id])
+  replies    Comments[]     @relation("CommentReplies")
+  idea       Ideas?         @relation(fields: [ideaId], references: [id])
+  post       Post?          @relation(fields: [postId], references: [id])
+  user       User           @relation(fields: [userId], references: [id])
 
-  model Votes {
-    id        String   @id @default(cuid())
-    userId    String
-    ideaId    String
-    postId    String?
-    type      VoteType
-    createdAt DateTime @default(now())
-    idea      Ideas    @relation(fields: [ideaId], references: [id])
-    post      Post?    @relation(fields: [postId], references: [id])
-    user      User     @relation(fields: [userId], references: [id])
+  @@index([userId])
+  @@index([ideaId])
+  @@index([postId])
+  @@index([createdAt(sort: Desc)])
+}
 
-    @@unique([userId, ideaId])
-  }
+model Votes {
+  id        String   @id @default(cuid())
+  userId    String
+  ideaId    String
+  postId    String?
+  type      VoteType
+  createdAt DateTime @default(now())
+  idea      Ideas    @relation(fields: [ideaId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  model CommentVotes {
-    id        String   @id @default(cuid())
-    userId    String
-    commentId String
-    type      VoteType
-    createdAt DateTime @default(now())
-    comment   Comments @relation(fields: [commentId], references: [id])
-    user      User     @relation(fields: [userId], references: [id])
+  @@unique([userId, ideaId])
+  @@index([userId, type])
+  @@index([ideaId, type])
+  @@index([createdAt(sort: Desc)])
+}
 
-    @@unique([userId, commentId])
-  }
+model CommentVotes {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  type      VoteType
+  createdAt DateTime @default(now())
+  comment   Comments @relation(fields: [commentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  model Feedback {
-    id        String           @id @default(cuid())
-    userId    String
-    productId String
-    category  FeedbackCategory @default(OTHER)
-    status    FeedbackStatus   @default(PENDING)
-    message   String
-    createdAt DateTime         @default(now())
-    product   Product          @relation(fields: [productId], references: [id])
-    user      User             @relation(fields: [userId], references: [id])
-  }
+  @@unique([userId, commentId])
+  @@index([userId, type])
+  @@index([commentId, type])
+  @@index([createdAt(sort: Desc)])
+}
 
-  model Follows {
-    id        String   @id @default(cuid())
-    userId    String
-    productId String
-    createdAt DateTime @default(now())
-    product   Product  @relation(fields: [productId], references: [id])
-    user      User     @relation(fields: [userId], references: [id])
+model Feedback {
+  id        String           @id @default(cuid())
+  userId    String
+  productId String
+  category  FeedbackCategory @default(OTHER)
+  status    FeedbackStatus   @default(PENDING)
+  message   String
+  createdAt DateTime         @default(now())
+  product   Product          @relation(fields: [productId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+}
 
-    @@unique([userId, productId])
-  }
+model Follows {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  model Launch {
-    id          String   @id @default(cuid())
-    productId   String
-    title       String
-    description String?
-    upvotes     Int      @default(0)
-    comments    Int      @default(0)
-    launchedAt  DateTime @default(now())
-    product     Product  @relation(fields: [productId], references: [id])
-  }
+  @@unique([userId, productId])
+}
 
-  model Leaderboard {
-    id        String            @id @default(cuid())
-    productId String
-    score     Float
-    rank      Int
-    period    LeaderboardPeriod
-    updatedAt DateTime          @updatedAt
-    product   Product           @relation(fields: [productId], references: [id])
-  }
+model Launch {
+  id          String   @id @default(cuid())
+  productId   String
+  title       String
+  description String?
+  upvotes     Int      @default(0)
+  comments    Int      @default(0)
+  launchedAt  DateTime @default(now())
+  product     Product  @relation(fields: [productId], references: [id])
+}
 
-  model Plans {
-    id            String          @id @default(cuid())
-    name          String
-    priceCents    Int
-    features      Json?
-    createdAt     DateTime        @default(now())
-    subscriptions Subscriptions[]
-  }
+model Leaderboard {
+  id        String            @id @default(cuid())
+  productId String
+  score     Float
+  rank      Int
+  period    LeaderboardPeriod
+  updatedAt DateTime          @updatedAt
+  product   Product           @relation(fields: [productId], references: [id])
+}
 
-  model Subscriptions {
-    id                   String             @id @default(cuid())
-    productId            String
-    planId               String
-    currentPeriodStart   DateTime?
-    currentPeriodEnd     DateTime?
-    status               SubscriptionStatus @default(TRIALING)
-    stripeSubscriptionId String
-    createdAt            DateTime           @default(now())
-    payments             Payments[]
-    plan                 Plans              @relation(fields: [planId], references: [id])
-    product              Product            @relation(fields: [productId], references: [id])
-  }
+model Plans {
+  id            String          @id @default(cuid())
+  name          String
+  priceCents    Int
+  features      Json?
+  createdAt     DateTime        @default(now())
+  subscriptions Subscriptions[]
+}
 
-  model Payments {
-    id              String        @id @default(cuid())
-    subscriptionId  String
-    amountCents     Int
-    currency        String        @default("USD")
-    status          PaymentStatus
-    paymentDate     DateTime?
-    stripePaymentId String
-    createdAt       DateTime      @default(now())
-    subscription    Subscriptions @relation(fields: [subscriptionId], references: [id])
-  }
+model Subscriptions {
+  id                   String             @id @default(cuid())
+  productId            String
+  planId               String
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  status               SubscriptionStatus @default(TRIALING)
+  stripeSubscriptionId String
+  createdAt            DateTime           @default(now())
+  payments             Payments[]
+  plan                 Plans              @relation(fields: [planId], references: [id])
+  product              Product            @relation(fields: [productId], references: [id])
+}
 
-  model Notifications {
-    id        String   @id @default(cuid())
-    userId    String
-    title     String
-    message   String
-    isRead    Boolean  @default(false)
-    createdAt DateTime @default(now())
-    user      User     @relation(fields: [userId], references: [id])
-  }
+model Payments {
+  id              String        @id @default(cuid())
+  subscriptionId  String
+  amountCents     Int
+  currency        String        @default("USD")
+  status          PaymentStatus
+  paymentDate     DateTime?
+  stripePaymentId String
+  createdAt       DateTime      @default(now())
+  subscription    Subscriptions @relation(fields: [subscriptionId], references: [id])
+}
 
-  model Session {
-    id        String   @id
-    expiresAt DateTime
-    token     String   @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    ipAddress String?
-    userAgent String?
-    userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Notifications {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
 
-    @@map("session")
-  }
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  model Account {
-    id                    String    @id
-    accountId             String
-    providerId            String
-    userId                String
-    accessToken           String?
-    refreshToken          String?
-    idToken               String?
-    accessTokenExpiresAt  DateTime?
-    refreshTokenExpiresAt DateTime?
-    scope                 String?
-    password              String?
-    createdAt             DateTime  @default(now())
-    updatedAt             DateTime  @updatedAt
-    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("session")
+}
 
-    @@map("account")
-  }
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  model Verification {
-    id         String   @id
-    identifier String
-    value      String
-    expiresAt  DateTime
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @default(now()) @updatedAt
+  @@map("account")
+}
 
-    @@map("verification")
-  }
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 
-  enum PaymentStatus {
-    SUCCEEDED
-    PENDING
-    FAILED
-  }
+  @@map("verification")
+}
 
-  enum SubscriptionStatus {
-    ACTIVE
-    PAST_DUE
-    TRIALING
-    CANCELED
-  }
+enum PaymentStatus {
+  SUCCEEDED
+  PENDING
+  FAILED
+}
 
-  enum IdeaStatus {
-    OPEN
-    IN_PROGRESS
-    COMPLETED
-    ARCHIVED
-  }
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  TRIALING
+  CANCELED
+}
 
-  enum VoteType {
-    UP
-    DOWN
-  }
+enum IdeaStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  ARCHIVED
+}
 
-  enum PostType {
-    UPDATE
-    FEATURE
-    BUGFIX
-    ANNOUNCEMENT
-    GENERAL
-  }
+enum VoteType {
+  UP
+  DOWN
+}
 
-  enum FeedbackCategory {
-    BUG
-    FEATURE
-    IDEA
-    OTHER
-  }
+enum PostType {
+  UPDATE
+  FEATURE
+  BUGFIX
+  ANNOUNCEMENT
+  GENERAL
+}
 
-  enum FeedbackStatus {
-    PENDING
-    IN_PROGRESS
-    RESOLVED
-    REJECTED
-  }
+enum FeedbackCategory {
+  BUG
+  FEATURE
+  IDEA
+  OTHER
+}
 
-  enum LeaderboardPeriod {
-    DAILY
-    WEEKLY
-    MONTHLY
-    ALL_TIME
-  }
+enum FeedbackStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
 
-  enum MembershipRole {
-    OWNER
-    ADMIN
-    MEMBER
-  }
+enum LeaderboardPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  ALL_TIME
+}
 
-  enum UserSegment {
-    DEFAULT
-    BETA_TESTER
-    FREE_USER
-    PAID_USER
-  }
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum UserSegment {
+  DEFAULT
+  BETA_TESTER
+  FREE_USER
+  PAID_USER
+}

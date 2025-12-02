@@ -11,6 +11,7 @@ const protectedRoutes = [
   "/settings",
   "/dashboard", 
   "/idea",
+  "/u/[name]",
 ]
 
 
