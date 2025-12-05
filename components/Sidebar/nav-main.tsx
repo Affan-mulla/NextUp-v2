@@ -1,5 +1,5 @@
-"use client"
-import { HugeiconsIcon, IconSvgElement } from '@hugeicons/react';
+"use client";
+import { HugeiconsIcon, IconSvgElement } from "@hugeicons/react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -24,10 +24,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
     <SidebarGroup>
       <SidebarGroupLabel>Explore</SidebarGroupLabel>
       <SidebarMenu>
-        
         {items.map((item) => {
           const isActive =
-            item.url === '/'
+            item.url === "/"
               ? pathname === item.url
               : pathname?.startsWith(item.url);
 
@@ -38,19 +37,45 @@ export function NavMain({ items }: { items: NavItem[] }) {
                 isActive={isActive}
                 tooltip={item.title}
                 className={
-                  "px-0 group/menu-item" /* keep container spacing minimal, anchor handles padding */
+                  "group-data-[active=true]:bg-sidebar-accent group-data-[active=true]:text-sidebar-accent-foreground" /* keep container spacing minimal, anchor handles padding */
                 }
               >
                 <Link
                   href={item.url}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={
-                    `flex w-full  items-center  px-3 py-2 rounded-md text-sm transition-colors duration-150  ` +
-                    (isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm dark:border-x-0 dark:border-b-2 dark:border-b-background/80 border'
-                      : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground')
+                  aria-current={isActive ? "page" : undefined}
+                  className={`
+                  flex w-full items-center p-4 text-sm transition-colors duration-150 relative
+
+                  ${
+                    isActive
+                      ? `
+                      bg-linear-to-b 
+                      from-secondary
+                      to-sidebar
+                      text-sidebar-accent-foreground
+
+                      border border-background
+
+                      shadow-[0_2px_1px_rgba(0,0,0,0.1)]
+                      dark:shadow-[0_4px_1px_-2px_rgba(0,0,0,0.3)]
+
+                      backdrop-blur-md
+                    `
+                                        : `
+                      text-muted-foreground
+                      hover:bg-foreground/5
+                      hover:text-sidebar-accent-foreground
+                    `
                   }
+
+                  `}
                 >
+                  {
+                    isActive && (
+                      <span className="absolute h-0.5 dark:block hidden bg-linear-to-b from-foreground/20 to-transparent w-full top-0 left-0"></span>
+                    )
+
+                  }
                   {item.icon && (
                     <span className="flex-none">
                       <HugeiconsIcon icon={item.icon} size={20} />
@@ -62,7 +87,6 @@ export function NavMain({ items }: { items: NavItem[] }) {
             </SidebarMenuItem>
           );
         })}
-       
       </SidebarMenu>
     </SidebarGroup>
   );

@@ -162,10 +162,10 @@ export default async function ProfilePage({ params }: PageProps) {
       </div>
 
       <div className="p-8 w-full max-w-sm lg:block hidden ">
-        <div className="relative max-w-72 w-full h-72 rounded-2xl overflow-hidden  border border-border  backdrop-blur shadow bg-linear-to-br from-primary/25 to-primary/15 via-secondary/10">
+        <div className="relative max-w-72 w-full h-72 rounded-2xl overflow-hidden  border border-white/15  backdrop-blur shadow ">
           {/* Soft glow accents */}
-          {/* <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-primary/30 blur-xl" />
-          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-ring/30 blur-2xl" /> */}
+          <div className="absolute -bottom-20   w-full h-52  bg-primary/25 animate-pulse duration-1000 transition blur-2xl" />
+          <div className="absolute -top-10  w-full h-40 rounded-full  bg-muted/10 blur-2xl" />
 
           {/* Content */}
           <div className="relative z-10 dark:bg-sidebar/20 bg-sidebar/40 h-full p-6  text-center">

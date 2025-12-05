@@ -6,61 +6,85 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  AddCircleHalfDotIcon,
-} from "@hugeicons/core-free-icons";
+import { AddCircleHalfDotIcon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { Suspense } from "react";
 import { IdeaFeedSkeleton } from "@/components/feed/IdeaCardSkeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UnifiedSearchBar } from "@/components/search/UnifiedSearchBar";
+import { Button } from "@/components/ui/button";
 
-const layout = async({ children }: { children: React.ReactNode }) => {
+const layout = async ({ children }: { children: React.ReactNode }) => {
   "use cache";
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-          <header className="flex h-16 border-b shrink-0 items-center gap-2 justify-between transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
-            </div>
-            <div className="flex-1 max-w-xl w-full">
-              <UnifiedSearchBar />
-            </div>
+        <header className="flex h-14 border-b shrink-0 items-center gap-2 justify-between transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 ">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+          </div>
+          <div className="flex-1 max-w-xl w-full">
+            <UnifiedSearchBar />
+          </div>
 
-            <div className="mr-4">
-              <Link
-                href="/idea"
-                className="relative flex items-center gap-2 rounded-lg border border-border
-             bg-gradient-to-br from-primary/10 via-primary/5 to-transparent
-             backdrop-blur-md md:px-5 md:py-2 p-2 text-sm font-medium text-foreground
-             transition-all duration-300 overflow-hidden group
-             shadow-sm 
-             shadow-foreground/10 dark:shadow-primary/20  hover:shadow-foreground/20 dark:hover:shadow-primary/20
+          <div className="mr-4">
+            <Link
+              href="/idea"
+              className="
            "
+            >
+              <Button
+                className="
+                relative overflow-hidden
+                flex items-center gap-2
+                px-6 py-3 rounded-lg
+                text-primary-foreground
+
+                bg-gradient-to-b
+                from-primary
+                to-primary/70
+
+                border border-white/10
+                shadow-[0_6px_18px_-6px_rgba(0,0,0,0.45)]
+                backdrop-blur-sm
+
+                transition-all duration-300
+                hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.6)]
+                active:scale-[0.98]
+  "
               >
-                <HugeiconsIcon
-                  icon={AddCircleHalfDotIcon}
-                  size={20}
-                  className="text-primary transition-transform duration-600 ease-in-out group-hover:rotate-360 z-10"
+                {/* Icon */}
+                <HugeiconsIcon icon={AddCircleHalfDotIcon} className="size-5" />
+
+                {/* Text */}
+                <span className="font-medium tracking-tight">Create</span>
+
+                {/* Top glossy highlight */}
+                <span
+                  className="
+                  absolute inset-0
+                  pointer-events-none
+                  bg-gradient-to-b
+                  from-white/10 to-transparent
+                  opacity-20
+                  rounded-lg
+    "
                 />
-                <p className="hidden md:block">Create</p>
-              </Link>
-            </div>  
-          </header>
-          <ScrollArea className="h-[calc(100vh-4rem)]">
-          <Suspense fallback={<IdeaFeedSkeleton/>}>
-          {children}
-          </Suspense>
-          </ScrollArea>
-        </SidebarInset>
-      </SidebarProvider>
+              </Button>
+            </Link>
+          </div>
+        </header>
+        <ScrollArea className="h-[calc(100vh-4rem)]">
+          <Suspense fallback={<IdeaFeedSkeleton />}>{children}</Suspense>
+        </ScrollArea>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
