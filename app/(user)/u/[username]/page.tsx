@@ -17,6 +17,7 @@ import {
   UserEdit01Icon,
 } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import { timeAgo } from "@/lib/utils/time";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -101,7 +102,11 @@ export default async function ProfilePage({ params }: PageProps) {
                     </Link>
                   ) : (
                     <Button className="bg-linear-to-b from-primary to-secondary/20 via-70%  shadow-md shadow-secondary/50">
-                      <HugeiconsIcon icon={UserAdd01Icon} strokeWidth={2} className="size-5" />
+                      <HugeiconsIcon
+                        icon={UserAdd01Icon}
+                        strokeWidth={2}
+                        className="size-5"
+                      />
                       Follow
                     </Button>
                   )}
@@ -151,7 +156,6 @@ export default async function ProfilePage({ params }: PageProps) {
                 value={profile.downvotesReceived}
               />
             </div>
-
           </CardContent>
         </Card>
 
@@ -162,70 +166,62 @@ export default async function ProfilePage({ params }: PageProps) {
       </div>
 
       <div className="p-8 w-full max-w-sm lg:block hidden ">
-        <div className="relative max-w-72 w-full h-72 rounded-2xl overflow-hidden  border border-white/15  backdrop-blur shadow ">
-          {/* Soft glow accents */}
-          <div className="absolute -bottom-20   w-full h-52  bg-primary/25 animate-pulse duration-1000 transition blur-2xl" />
-          <div className="absolute -top-10  w-full h-40 rounded-full  bg-muted/10 blur-2xl" />
+        <div className="h-68 relative w-64 bg-card overflow-hidden rounded-2xl shadow-[0_2px_4px_-2px_rgba(0,0,0,.2)]">
+          <div
+            className="absolute inset-[3px] rounded-2xl
+           z-60
+             bg-gradient-to-b from-card to-card/50
+          shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]
+          dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
+          />
+          <div
+            className="absolute  rounded-2xl
+            dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] z-60  "
+          />
 
-          {/* Content */}
-          <div className="relative z-10 dark:bg-sidebar/20 bg-sidebar/40 h-full p-6  text-center">
-            <div>
-              <h2 className="text-xl tracking-wide font-bold mb-2 font-outfit ">
+          <div className="z-99 absolute p-4 w-full h-full">
+            <div className=" mt-2">
+              <h1 className="text-2xl font-semibold text-center font-outfit tracking-wide ">
                 {profile.name}
-              </h2>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-4">
-                @{profile.username} • Joined{" "}
-                {new Date(profile.createdAt).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
-            <div>
-              <div className="grid grid-cols-2 gap-4">
-                <Stat
-                  icon={
-                    <HugeiconsIcon
-                      icon={File02Icon}
-                      size={20}
-                      className="text-muted-foreground"
-                    />
-                  }
-                  label="Posts"
-                  value={profile._count.ideas}
-                />
-                <Stat
-                  icon={
-                    <HugeiconsIcon
-                      icon={Message02Icon}
-                      size={20}
-                      className="text-muted-foreground"
-                    />
-                  }
-                  label="Comments"
-                  value={profile._count.comments}
-                />
-                <Stat
-                  icon={<ArrowBigUpDash className="h-5 w-5 text-green-500" />}
-                  label="Upvotes"
-                  value={profile.upvotesReceived}
-                />
-                <Stat
-                  icon={<ArrowBigDownDash className="h-5 w-5 text-red-500" />}
-                  label="Downvotes"
-                  value={profile.downvotesReceived}
-                />
+              </h1>
+              <div className="flex gap-2 mt-2 items-center justify-center">
+                <p className="text-muted-foreground text-sm">
+                  @{profile.username}
+                </p>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <HugeiconsIcon icon={Calendar02Icon} size={18} />
+                  Joined{" "}
+                  {timeAgo(new Date(profile.createdAt))}
+                </p>
+
+              </div>
+
+              <div  className="mt-4 p-2 grid grid-cols-2 gap-4">
+                  <Stat icon={<HugeiconsIcon icon={File02Icon} size={20} />} label="Posts" value={profile._count.ideas} />
+                  <Stat icon={<HugeiconsIcon icon={Message02Icon} size={20} />} label="Comments" value={profile._count.comments} />
+                  <Stat icon={<ArrowBigUpDash className="h-5 w-5 text-green-500" />} label="Upvotes" value={profile.upvotesReceived} />
+                  <Stat icon={<ArrowBigDownDash className="h-5 w-5 text-red-500" />} label="Downvotes" value={profile.downvotesReceived} />
               </div>
             </div>
           </div>
+
+          <div
+            className=" absolute z-50 h-full w-full  
+           bottom-0 backdrop-blur-2xl "
+          >
+          </div>
+
+          <div className=" absolute z-10 h-40 w-full bg-primary bottom-0" />
+          <div className=" absolute z-20 h-25  w-full bg-amber-500 bottom-0" />
+          <div className=" absolute z-30 h-10 w-full bg-amber-100 bottom-0" />
         </div>
       </div>
+
+
     </div>
   );
 }
-
+// Stat Component
 function Stat({
   icon,
   label,
@@ -245,3 +241,51 @@ function Stat({
     </div>
   );
 }
+
+
+// Here is an alternative profile card design that is currently commented out.
+ {/* <div className="p-8 w-full max-w-sm lg:block hidden ">
+        <div className="h-68 relative w-64 bg-card overflow-hidden rounded-2xl shadow-[0_2px_4px_-2px_rgba(0,0,0,.2)]">
+          <div
+            className="absolute inset-[3px] rounded-2xl
+           z-60
+             bg-gradient-to-b from-card to-card/50
+          shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]
+          dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
+          />
+          <div
+            className="absolute  rounded-2xl
+            bg-secondary inset-0
+            dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] z-50  "
+          />
+
+          <div className="z-99 absolute p-4 w-full h-full">
+            <div className=" mt-2">
+              <h1 className="text-2xl font-semibold text-center font-outfit tracking-wide ">
+                {profile.name}
+              </h1> 
+              <div className="flex gap-2 mt-2 items-center justify-center">
+                <p className="text-muted-foreground text-sm">
+                  @{profile.username}
+                </p>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <HugeiconsIcon icon={Calendar02Icon} size={18} />
+                  Joined{" "}
+                  {timeAgo(new Date(profile.createdAt))}
+                </p>
+
+              </div>
+
+              <div  className="mt-4 p-2 grid grid-cols-2 gap-4">
+                  <Stat icon={<HugeiconsIcon icon={File02Icon} size={20} />} label="Posts" value={profile._count.ideas} />
+                  <Stat icon={<HugeiconsIcon icon={Message02Icon} size={20} />} label="Comments" value={profile._count.comments} />
+                  <Stat icon={<ArrowBigUpDash className="h-5 w-5 text-green-500" />} label="Upvotes" value={profile.upvotesReceived} />
+                  <Stat icon={<ArrowBigDownDash className="h-5 w-5 text-red-500" />} label="Downvotes" value={profile.downvotesReceived} />
+              </div>
+            </div>
+          </div>
+
+        
+        </div>
+      </div>
+      */}
