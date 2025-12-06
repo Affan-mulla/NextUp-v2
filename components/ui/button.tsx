@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "relative bg-linear-to-b from-primary/90 to-primary via-primary/90 text-primary-foreground ",
+          "relative bg-primary  text-primary-foreground shadow-sm ",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
@@ -57,7 +57,7 @@ function Button({
     >
       {props.children}
       {variant === "default" && (
-        <div className=" absolute inset-0  bg-linear-to-b from-secondary-foreground/20 via-secondary-foreground/10 to-transparent h-full z-10 rounded-t-md m-[1px] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:from-secondary-foreground/25 hover:via-secondary-foreground/15 " />
+        <div className=" absolute inset-0 z-0  bg-linear-to-b from-neutral-50/20 via-neutral-100/10  to-transparent h-full rounded-t-md m-px dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:from-neutral-50/25 hover:via-neutral-100/15 transition-colors " />
       )}
     </Comp>
   );

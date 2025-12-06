@@ -48,10 +48,12 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
 
     
   return (
-    <div className="flex items-center gap-2 bg-card p-2 rounded-md border border-border shadow">
+    <div className="flex items-center bg-background hover:border-primary transition-colors border border-border rounded-md gap-0.5">
       {/* Upvote Button */}
+
+   
       <Button
-        variant="secondary"
+        variant="ghost"
         size="icon-sm"
         onClick={(e) => {
           e.stopPropagation();
@@ -59,8 +61,8 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
         }}
         disabled={isVoting}
         className={cn(
-          "hover:text-green-500 border-t border-l  border-border rounded-md shadow box-border transition-colors",
-          isUpvoted && "text-green-500 bg-green-500/10",
+          "hover:text-green-500 hover:backdrop-blur-2xl z-20",
+          isUpvoted && "text-green-500",
           isVoting && "opacity-50 cursor-not-allowed"
         )}
       >
@@ -74,7 +76,7 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
 
       {/* Downvote Button */}
       <Button
-        variant="secondary"
+        variant="ghost"
         size="icon-sm"
         onClick={(e) => {
           e.stopPropagation();
@@ -82,8 +84,8 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
         }}
         disabled={isVoting}
         className={cn(
-          "hover:text-red-500 border-t border-l border-border rounded-md shadow box-border transition-colors",
-          isDownvoted && "text-red-500 bg-red-500/10",
+          "hover:text-red-500 ",
+          isDownvoted && "text-red-500",
           isVoting && "opacity-50 cursor-not-allowed"
         )}
       >
