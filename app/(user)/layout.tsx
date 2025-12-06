@@ -40,42 +40,16 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
            "
             >
               <Button
-                className="
-                relative overflow-hidden
-                flex items-center gap-2
-                px-6 py-3 rounded-lg
-                text-primary-foreground
-
-                bg-gradient-to-b
-                from-primary
-                to-primary/70
-
-                border border-white/10
-                shadow-[0_6px_18px_-6px_rgba(0,0,0,0.45)]
-                backdrop-blur-sm
-
-                transition-all duration-300
-                hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.6)]
-                active:scale-[0.98]
-  "
+                className=""
+                variant={"default" }
               >
                 {/* Icon */}
-                <HugeiconsIcon icon={AddCircleHalfDotIcon} className="size-5" />
+                <HugeiconsIcon icon={AddCircleHalfDotIcon} className="size-5" strokeWidth={2} />
 
                 {/* Text */}
-                <span className="font-medium tracking-tight">Create</span>
+                <span className="font-medium">Create</span>
 
-                {/* Top glossy highlight */}
-                <span
-                  className="
-                  absolute inset-0
-                  pointer-events-none
-                  bg-gradient-to-b
-                  from-white/10 to-transparent
-                  opacity-20
-                  rounded-lg
-    "
-                />
+                
               </Button>
             </Link>
           </div>

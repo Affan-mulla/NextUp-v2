@@ -50,15 +50,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
                     isActive
                       ? `
                       bg-linear-to-b 
-                      from-secondary
-                      to-sidebar
+                      from-muted to-secondary
                       text-sidebar-accent-foreground
-
-                      border border-background
-
-                      shadow-[0_2px_1px_rgba(0,0,0,0.1)]
                       dark:shadow-[0_4px_1px_-2px_rgba(0,0,0,0.3)]
-
                       backdrop-blur-md
                     `
                                         : `
@@ -72,7 +66,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                 >
                   {
                     isActive && (
-                      <span className="absolute h-0.5 dark:block hidden bg-linear-to-b from-foreground/20 to-transparent w-full top-0 left-0"></span>
+                      <span className="absolute shadow-[inset_0_1px_1px_rgba(0,0,0,0.2),inset_0_-1px_1px_rgba(0,0,0,0.2)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] h-full inset-0 w-full rounded-md"></span>
                     )
 
                   }

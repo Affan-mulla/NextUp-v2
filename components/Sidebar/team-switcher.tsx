@@ -58,8 +58,9 @@ function AddProductButton() {
       className={cn("mt-2" , 
   )}>
       <Button
+      variant={"default"}
         className="
-          w-full border-2 dark:border-foreground/30 border-background/20 p-4  bg-linear-to-b to-secondary/15 via-secondary/10 from-transparent backdrop-blur-md  
+          w-full
           transition-transform duration-200"
           size={`${open ? "sm" : "icon-sm"}`}
       >
