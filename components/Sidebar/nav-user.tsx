@@ -12,7 +12,6 @@
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-  import Gemini from "@/components/kokonutui/gemini";
   import { authClient } from "@/lib/auth/auth-client";
   import { useRouter } from "next/navigation";
   import { toast } from "sonner";
@@ -27,8 +26,9 @@
   import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
   import Togglemode from "../Theme/Toggle-mode";
   import { HugeiconsIcon } from "@hugeicons/react";
-  import { Sun02FreeIcons } from "@hugeicons/core-free-icons";
+  import { CreditCardIcon, Logout01Icon, Settings03Icon, Sun02FreeIcons, UserIcon } from "@hugeicons/core-free-icons";
   import { useSidebar } from "../ui/sidebar";
+import { Button } from "../ui/button";
 
   interface MenuItem {
     label: string;
@@ -72,24 +72,18 @@
       {
         label: "Profile",
         href: `/u/${user.name}`,
-        icon: <User className="w-4 h-4" />,
-      },
-      {
-        label: "Model",
-        value: "Gemini 2.0 Flash",
-        href: "#",
-        icon: <Gemini className="w-4 h-4" />,
+        icon: <HugeiconsIcon icon={UserIcon} className="size-[18px]"  />
       },
       {
         label: "Subscription",
         value: "PRO",
         href: "#",
-        icon: <CreditCard className="w-4 h-4" />,
+        icon: <HugeiconsIcon icon={CreditCardIcon} className="size-[18px]" />
       },
       {
         label: "Settings",
         href: "/settings",
-        icon: <Settings className="w-4 h-4" />,
+        icon: <HugeiconsIcon icon={Settings03Icon} className="size-[18px]" />
       },
     ];
 
@@ -129,18 +123,18 @@
               >
                 {open && (
                   <div className="text-left">
-                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">
+                    <div className="text-sm font-medium tracking-tight leading-tight">
                       {user.name}
                     </div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 tracking-tight leading-tight">
+                    <div className="text-xs text-muted-foreground tracking-tight leading-tight">
                       {user.email}
                     </div>
                   </div>
                 )}
 
                 <div className="relative">
-                  <div className=" rounded-full bg-linear-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-background">
+                  <div className=" rounded-full bg-linear-to-br from-amber-50 via-orange-400 to-primary p-[2.5px]">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-background flex items-center justify-center">
                       <Avatar>
                         <AvatarFallback>
                           {user.name.charAt(0).toUpperCase()}
@@ -185,9 +179,9 @@
             )}
 
             <DropdownMenuContent
-              align="end"
+              side="top" 
               sideOffset={4}
-              className="w-64 p-2 bg-background/60 backdrop-blur-sm border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl shadow-xl shadow-zinc-900/5 dark:shadow-zinc-950/20 
+              className="w-64 p-2 bg-background/60 backdrop-blur-sm border  border-border rounded-xl shadow-xl shadow-zinc-900/5 dark:shadow-zinc-950/20 
                       data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-top-right"
             >
               <div className="space-y-1">
@@ -195,11 +189,11 @@
                   <DropdownMenuItem key={item.label} asChild>
                     <Link
                       href={item.href}
-                      className="flex items-center p-3 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50"
+                      className="flex items-center px-2 py-2  rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50"
                     >
                       <div className="flex items-center gap-2 flex-1">
-                        {item.icon}
-                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight whitespace-nowrap group-hover:text-zinc-950 dark:group-hover:text-zinc-50 transition-colors">
+                          {item.icon}
+                        <span className="text-sm font-medium  tracking-tight leading-tight whitespace-nowrap group-hover:text-zinc-950 dark:group-hover:text-zinc-50 transition-colors">
                           {item.label}
                         </span>
                       </div>
@@ -227,7 +221,7 @@
               <DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
                 <div className="flex items-center  hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50">
                   <div className="flex items-center gap-2 flex-1">
-                    <HugeiconsIcon icon={Sun02FreeIcons} />
+                    <HugeiconsIcon icon={Sun02FreeIcons} className="size-[18px]" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight whitespace-nowrap  transition-colors">
                       Theme
                     </span>
@@ -238,12 +232,13 @@
 
               <DropdownMenuSeparator className=" bg-linear-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-800" />
 
-              <DropdownMenuItem asChild>
-                <button
+              <DropdownMenuItem variant="destructive" asChild>
+                <Button
                   type="button"
                   onClick={handleSignOut}
                   disabled={isLoggingOut}
-                  className="w-full  flex items-center gap-3 p-3 duration-200 bg-red-500/10 rounded-xl hover:bg-red-500/20 cursor-pointer border border-transparent hover:border-red-500/30 hover:shadow-sm transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                 variant="ghost"
+                 className="w-full rounded-xl justify-start hover:bg-destructive border border-transparent hover:border-red-200/50 dark:hover:border-red-700/50 transition-all duration-200 cursor-pointer "
                 >
                   {isLoggingOut ? (
                     <>
@@ -254,13 +249,13 @@
                     </>
                   ) : (
                     <>
-                      <LogOut className="w-4 h-4 text-red-500 group-hover:text-red-600" />
+                      <HugeiconsIcon icon={Logout01Icon} />
                       <span className="text-sm font-medium text-red-500 group-hover:text-red-600">
                         Sign Out
                       </span>
                     </>
                   )}
-                </button>
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </div>
