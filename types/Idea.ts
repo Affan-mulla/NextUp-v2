@@ -10,6 +10,9 @@ export interface IdeaById {
   uploadedImages: string[] | [];
   userId: string;
   votesCount: number;
+  _count?: {
+    comments: number;
+  };
   userVote?: {
     type: VoteType;
   } | null;

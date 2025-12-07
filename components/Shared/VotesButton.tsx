@@ -4,23 +4,34 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useIsVotingIdea, useVoteIdea, VoteType } from "@/hooks/useVoting";
 
-const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount : number, userVoteType : {
-    type : VoteType 
-}| null | undefined}) => {
-     /**
-       * Get vote mutation from React Query
-       * mutate: Function to trigger vote
-       */
-      const { mutate: vote } = useVoteIdea();
-    
-      /**
-       * Per-idea pending state using mutation cache
-       * Only true when THIS specific idea is being voted on
-       * Prevents disabling buttons on unrelated posts
-       */
-      const isVoting = useIsVotingIdea(id);
+const VotesButton = ({
+  id,
+  votesCount,
+  userVoteType,
+}: {
+  id: string;
+  votesCount: number;
+  userVoteType:
+    | {
+        type: VoteType;
+      }
+    | null
+    | undefined;
+}) => {
+  /**
+   * Get vote mutation from React Query
+   * mutate: Function to trigger vote
+   */
+  const { mutate: vote } = useVoteIdea();
 
-        /**
+  /**
+   * Per-idea pending state using mutation cache
+   * Only true when THIS specific idea is being voted on
+   * Prevents disabling buttons on unrelated posts
+   */
+  const isVoting = useIsVotingIdea(id);
+
+  /**
    * Determine vote states
    * isUpvoted: true if user has upvoted this idea
    * isDownvoted: true if user has downvoted this idea
@@ -29,29 +40,27 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
   const isDownvoted = userVoteType?.type === "DOWN";
 
   /**
-     * Handle vote button click
-     * 
-     * Flow:
-     * 1. Check if already voting (prevent double-click)
-     * 2. Call vote mutation (triggers optimistic update in useVoteIdea)
-     * 3. UI updates instantly via optimistic cache update
-     * 
-     * @param voteType - "UP" or "DOWN"
-     */
-    const handleVote = (voteType: VoteType) => {
-      // Prevent multiple simultaneous votes on same idea
-      if (isVoting) return;
-  
-      // Trigger vote mutation with optimistic update
-      vote({ ideaId: id, voteType });
-    };
+   * Handle vote button click
+   *
+   * Flow:
+   * 1. Check if already voting (prevent double-click)
+   * 2. Call vote mutation (triggers optimistic update in useVoteIdea)
+   * 3. UI updates instantly via optimistic cache update
+   *
+   * @param voteType - "UP" or "DOWN"
+   */
+  const handleVote = (voteType: VoteType) => {
+    // Prevent multiple simultaneous votes on same idea
+    if (isVoting) return;
 
-    
+    // Trigger vote mutation with optimistic update
+    vote({ ideaId: id, voteType });
+  };
+
   return (
-    <div className="flex items-center bg-background hover:border-primary transition-colors border border-border rounded-md gap-0.5">
+    <div className="flex items-center bg-popover/90 hover:border-primary transition-colors border border-border rounded-md gap-0.5">
       {/* Upvote Button */}
 
-   
       <Button
         variant="ghost"
         size="icon-sm"
@@ -61,12 +70,15 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
         }}
         disabled={isVoting}
         className={cn(
-          "hover:text-green-500 hover:backdrop-blur-2xl z-20",
-          isUpvoted && "text-green-500",
-          isVoting && "opacity-50 cursor-not-allowed"
+          "hover:text-green-500 text-muted-foreground  hover:backdrop-blur-2xl z-20 transition-colors",
+          isVoting && "opacity-50 cursor-not-allowed",
+          isUpvoted && "text-green-500"
         )}
       >
-        <ArrowBigUpDash size={10} className="mr-px" />
+        <ArrowBigUpDash
+          size={10}
+          className={cn("transition-all", isUpvoted && "fill-current")}
+        />
       </Button>
 
       {/* Vote Count */}
@@ -84,12 +96,15 @@ const VotesButton = ({id, votesCount, userVoteType} : {id : string, votesCount :
         }}
         disabled={isVoting}
         className={cn(
-          "hover:text-red-500 ",
+          "hover:text-red-500 text-muted-foreground transition-colors",
           isDownvoted && "text-red-500",
           isVoting && "opacity-50 cursor-not-allowed"
         )}
       >
-        <ArrowBigDownDash className="mr-px" size={10} />
+        <ArrowBigDownDash
+          size={10}
+          className={cn("transition-all", isDownvoted && "fill-current")}
+        />
       </Button>
     </div>
   );

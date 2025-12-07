@@ -198,6 +198,12 @@ export const getIdeaById = cache(async (id: string): Promise<IdeaById> => {
   // Ensure author is a single object, not an array
   const author = Array.isArray(idea.author) ? idea.author[0] : idea.author;
 
+  // Get comment count for this idea
+  const { count: commentCount } = await supabase
+    .from("Comments")
+    .select("id", { count: "exact", head: true })
+    .eq("ideaId", idea.id);
+
   // Get user's vote if authenticated
   let userVote = null;
   if (userId) {
@@ -214,6 +220,9 @@ export const getIdeaById = cache(async (id: string): Promise<IdeaById> => {
   return {
     ...idea,
     author,
+    _count: {
+      comments: commentCount || 0,
+    },
     userVote,
     userVoteType: userVote, // Legacy field for backward compatibility
   } as IdeaById;

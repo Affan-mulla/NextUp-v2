@@ -30,6 +30,7 @@ import {  type VoteType } from "@/hooks/useVoting";
 import { useRouter } from "next/navigation";
 import VotesButton from "../Shared/VotesButton";
 import { Button } from "../ui/button";
+import CommentBox from "../Shared/CommentBox";
 
 // ============================================================================
 // TypeScript Types
@@ -79,7 +80,7 @@ const IdeaCard = ({
 
   return (
     <div className="">
-      <Card className="bg-background py-3 gap-4 border-0 rounded-none transition-all duration-200 hover:bg-accent/30 cursor-pointer"
+      <Card className="bg-background py-3 gap-4 border-0 rounded-none transition-colors duration-200 dark:hover:bg-secondary/20 hover:bg-secondary  cursor-pointer"
         onClick={() => {  
           router.push(`/idea/${id}`);
         }}
@@ -124,21 +125,12 @@ const IdeaCard = ({
         </CardContent>
 
         {/* Footer */}
-        <CardFooter className="flex items-center gap-2">
+        <CardFooter className="flex items-center gap-2 h-8">
           {/* Votes */}
          <VotesButton id={id} votesCount={votesCount} userVoteType={userVote} />
 
           {/* Comments */}
-          <CardAction className="flex items-center gap-2 rounded-md px-2 py-1.5 border border-border bg-background hover:border-primary transition-colors">
-            <HugeiconsIcon icon={Comment03Icon} className="size-4 text-muted-foreground " />
-            <span className="text-sm font-medium">{commentsCount}</span>
-          </CardAction>
-
-          <CardAction>
-            <Button variant={"link"} size={"icon-sm"} className="border border-border bg-background hover:border-primary transition-colors">
-            <HugeiconsIcon icon={Bookmark01Icon} className="size-4 text-muted-foreground" strokeWidth={1.5} />
-            </Button>
-          </CardAction>
+          <CommentBox commentsCount={commentsCount} />
         </CardFooter>
       </Card>
     </div>
