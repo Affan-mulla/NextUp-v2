@@ -1,114 +1,64 @@
 import { prisma } from "@/lib/prisma";
-import { VoteType } from "@prisma/client";
+import {
+  ProfileComment,
+  ProfilePost,
+  ProfileUser,
+  ProfileVote,
+} from "@/types/profile";
+
 import { cache } from "react";
 
-export interface ProfileData {
-  id: string;
-  username: string;
-  name: string;
-  image: string | null;
-  createdAt: Date;
-  bio?: string | null;
-  _count: {
-    ideas: number;
-    comments: number;
-  };
-  upvotesReceived: number;
-  downvotesReceived: number;
-}
-
-export interface ProfilePost {
-  id: string;
-  title: string;
-  description: any;
-  votesCount: number;
-  createdAt: Date;
-  uploadedImages: string[];
-  _count: {
-    comments: number;
-  };
-}
-
-export interface ProfileComment {
-  id: string;
-  content: string;
-  votesCount: number;
-  createdAt: Date;
-  idea: {
-    id: string;
-    title: string;
-  } | null;
-  post: {
-    id: string;
-    title: string;
-  } | null;
-}
-
-export interface ProfileVote {
-  id: string;
-  type: VoteType;
-  createdAt: Date;
-  idea: {
-    id: string;
-    title: string;
-    votesCount: number;
-    author: {
-      username: string;
-      name: string;
-      image: string | null;
-    };
-  };
-}
-
-export const getUserProfile = cache(async (username: string): Promise<ProfileData | null> => {
-  const user = await prisma.user.findUnique({
-    where: { username },
-    select: {
-      id: true,
-      username: true,
-      name: true,
-      image: true,
-      createdAt: true,
-      _count: {
-        select: {
-          ideas: true,
-          comments: {
-            where: {
-              isDeleted: false,
+export const getUserProfile = cache(
+  async (username: string): Promise<ProfileUser | null> => {
+    const user = await prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        image: true,
+        createdAt: true,
+        _count: {
+          select: {
+            ideas: true,
+            comments: {
+              where: {
+                isDeleted: false,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!user) return null;
+    if (!user) return null;
 
-  const [upvotesReceived, downvotesReceived] = await Promise.all([
-    prisma.votes.count({
-      where: {
-        idea: {
-          userId: user.id,
+    const [upvotesReceived, downvotesReceived] = await Promise.all([
+      prisma.votes.count({
+        where: {
+          idea: {
+            userId: user.id,
+          },
+          type: "UP",
         },
-        type: "UP",
-      },
-    }),
-    prisma.votes.count({
-      where: {
-        idea: {
-          userId: user.id,
+      }),
+      prisma.votes.count({
+        where: {
+          idea: {
+            userId: user.id,
+          },
+          type: "DOWN",
         },
-        type: "DOWN",
-      },
-    }),
-  ]);
+      }),
+    ]);
 
-  return {
-    ...user,
-    upvotesReceived,
-    downvotesReceived,
-  };
-});
+    return {
+      ...user,
+      upvotesReceived,
+      downvotesReceived,
+    };
+  }
+);
 
 export async function getUserPosts(
   username: string,
@@ -125,9 +75,10 @@ export async function getUserPosts(
     return { posts: [], nextCursor: null };
   }
 
-  const orderBy = sortBy === "latest" 
-    ? { createdAt: "desc" as const }
-    : { votesCount: "desc" as const };
+  const orderBy =
+    sortBy === "latest"
+      ? { createdAt: "desc" as const }
+      : { votesCount: "desc" as const };
 
   const posts = await prisma.ideas.findMany({
     where: {
@@ -143,8 +94,20 @@ export async function getUserPosts(
       title: true,
       description: true,
       votesCount: true,
+      votes: {
+        select: {
+          type: true,
+        },
+      },
       createdAt: true,
       uploadedImages: true,
+      author: {
+        select: {
+          username: true,
+          name: true,
+          image: true,
+        },
+      },
       _count: {
         select: {
           comments: {
@@ -163,7 +126,10 @@ export async function getUserPosts(
   const results = hasNextPage ? posts.slice(0, -1) : posts;
 
   return {
-    posts: results,
+    posts: results.map((post) => ({
+      ...post,
+      votes: post.votes[0] ? post.votes[0].type : undefined,
+    })),
     nextCursor: hasNextPage ? results[results.length - 1].id : null,
   };
 }
@@ -183,9 +149,10 @@ export async function getUserComments(
     return { comments: [], nextCursor: null };
   }
 
-  const orderBy = sortBy === "latest" 
-    ? { createdAt: "desc" as const }
-    : { votesCount: "desc" as const };
+  const orderBy =
+    sortBy === "latest"
+      ? { createdAt: "desc" as const }
+      : { votesCount: "desc" as const };
 
   const comments = await prisma.comments.findMany({
     where: {
@@ -202,10 +169,33 @@ export async function getUserComments(
       content: true,
       votesCount: true,
       createdAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          image: true,
+        },
+      },
       idea: {
         select: {
           id: true,
           title: true,
+        },
+      },
+      parent:{
+        select:{
+          user:{
+            select:{
+              username:true,
+              image:true
+            }
+          }
+        }
+      },
+      commentId: true,
+      votes: {
+        select: {
+          type: true,
         },
       },
       post: {
@@ -223,7 +213,9 @@ export async function getUserComments(
   const results = hasNextPage ? comments.slice(0, -1) : comments;
 
   return {
-    comments: results,
+    comments: results.map((com) => {
+      return { ...com, votes: com.votes[0] ? com.votes[0].type : undefined };
+    }),
     nextCursor: hasNextPage ? results[results.length - 1].id : null,
   };
 }
@@ -234,9 +226,10 @@ export async function getUserUpvotes(
   limit = 10,
   sortBy: "latest" | "top" = "latest"
 ): Promise<{ votes: ProfileVote[]; nextCursor: string | null }> {
-  const orderBy = sortBy === "latest" 
-    ? { createdAt: "desc" as const }
-    : { idea: { votesCount: "desc" as const } };
+  const orderBy =
+    sortBy === "latest"
+      ? { createdAt: "desc" as const }
+      : { idea: { votesCount: "desc" as const } };
 
   const votes = await prisma.votes.findMany({
     where: {
@@ -256,7 +249,13 @@ export async function getUserUpvotes(
         select: {
           id: true,
           title: true,
+          uploadedImages: true,
           votesCount: true,
+           _count:{
+            select:{
+              comments:true
+            }
+          },
           author: {
             select: {
               username: true,
@@ -286,9 +285,10 @@ export async function getUserDownvotes(
   limit = 10,
   sortBy: "latest" | "top" = "latest"
 ): Promise<{ votes: ProfileVote[]; nextCursor: string | null }> {
-  const orderBy = sortBy === "latest" 
-    ? { createdAt: "desc" as const }
-    : { idea: { votesCount: "desc" as const } };
+  const orderBy =
+    sortBy === "latest"
+      ? { createdAt: "desc" as const }
+      : { idea: { votesCount: "desc" as const } };
 
   const votes = await prisma.votes.findMany({
     where: {
@@ -308,6 +308,12 @@ export async function getUserDownvotes(
         select: {
           id: true,
           title: true,
+          uploadedImages: true,
+          _count: {
+            select:{
+              comments: true
+            }
+          },
           votesCount: true,
           author: {
             select: {

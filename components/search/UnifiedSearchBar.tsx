@@ -190,12 +190,12 @@ export const UnifiedSearchBar: React.FC = () => {
 
       <Input
         ref={inputRef}
-        placeholder="Search users or products…"
+        placeholder="Find users or products..."
         value={query}
         onChange={handleChange}
         onFocus={() => query && setIsOpen(true)}
         onKeyDown={handleKeyDown}
-        className="bg-popover text-foreground h-9 rounded-lg border backdrop-blur-xl dark:border-border shadow border-accent-foreground/15 focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
+        className="bg-popover text-xs text-foreground h-9 rounded-lg border dark:border-border shadow-[0_2px_2px_-2px_rgba(0,0,0,0.2)] border-accent-foreground/15 focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
       />
 
       <AnimatePresence>

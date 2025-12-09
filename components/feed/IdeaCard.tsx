@@ -15,22 +15,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
-  CardAction,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Bookmark01Icon, Bookmark02Icon, Comment03Icon } from "@hugeicons/core-free-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import {  type VoteType } from "@/hooks/useVoting";
 import { useRouter } from "next/navigation";
 import VotesButton from "../Shared/VotesButton";
-import { Button } from "../ui/button";
 import CommentBox from "../Shared/CommentBox";
+import SaveIdea from "../Shared/SaveIdea";
 
 // ============================================================================
 // TypeScript Types
@@ -42,12 +39,10 @@ interface IdeaCardProps {
   image?: string;
   votesCount: number;
   commentsCount: number;
-  avatar?: string;
+  avatar: string | null;
   username: string;
-  createdAt: string;
-  userVote?: {
-    type: VoteType;
-  } | null;
+  createdAt: string | Date;
+  userVote?: VoteType;
 }
 
 // ============================================================================
@@ -80,7 +75,7 @@ const IdeaCard = ({
 
   return (
     <div className="">
-      <Card className="bg-background py-3 gap-4 border-0 rounded-none transition-colors duration-200 dark:hover:bg-secondary/20 hover:bg-secondary  cursor-pointer"
+      <Card className="bg-background py-3 gap-4 border-0 shadow-none rounded-none transition-colors duration-200 dark:hover:bg-secondary/20 hover:bg-secondary  cursor-pointer"
         onClick={() => {  
           router.push(`/idea/${id}`);
         }}
@@ -88,7 +83,7 @@ const IdeaCard = ({
         {/* Header */}
         <CardHeader className="flex items-center gap-2">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={avatar} />
+            <AvatarImage src={avatar || undefined} />
             <AvatarFallback>{username.substring(0, 1).toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
 
@@ -131,6 +126,8 @@ const IdeaCard = ({
 
           {/* Comments */}
           <CommentBox commentsCount={commentsCount} />
+
+          <SaveIdea />
         </CardFooter>
       </Card>
     </div>

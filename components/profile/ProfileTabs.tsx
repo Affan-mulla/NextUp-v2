@@ -32,14 +32,17 @@ export function ProfileTabs({
     );
   }
 
-  const glassSpring = { type: "spring", stiffness: 420, damping: 30, mass: 0.3 };
-  const activeSpring = { type: "spring", stiffness: 540, damping: 34 };
+  const glassSpring = {
+    type: "spring",
+    stiffness: 420,
+    damping: 30,
+    mass: 0.3,
+  } as const;
+  const activeSpring = { type: "spring", stiffness: 440, damping: 30 } as const;
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-
       <div className="relative h-13 rounded-full p-2 mb-4">
-
         {/* OUTER SHELL — theme aware */}
         <div
           className="absolute inset-0 rounded-full 
@@ -60,7 +63,7 @@ export function ProfileTabs({
           <motion.div
             layoutId="glass"
             transition={glassSpring}
-            className="absolute inset-[6px] rounded-full 
+            className="absolute inset-1.5 rounded-full 
             bg-foreground/5 dark:bg-foreground/10 
             backdrop-blur-sm border border-border/40
             dark:shadow-[0_6px_18px_rgba(0,0,0,0.35)] z-10"
@@ -87,7 +90,7 @@ export function ProfileTabs({
                   <motion.div
                     layoutId="glass"
                     transition={glassSpring}
-                    className="absolute inset-0 rounded-full 
+                    className="absolute inset-y-0 inset-x-1 rounded-full 
                     bg-foreground/5 dark:bg-foreground/10
                     backdrop-blur-sm border border-border/40 
                     dark:shadow-[0_6px_18px_rgba(0,0,0,0.35)] z-10"
@@ -105,7 +108,9 @@ export function ProfileTabs({
                     dark:from-primary/80 dark:to-primary/90
                     
                     border border-border/40 z-20"
-                  />
+                  >
+                    <div className=" absolute inset-0 z-0  bg-linear-to-b from-neutral-50/20 via-neutral-100/10  to-transparent h-full rounded-2xl dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:from-neutral-50/25 hover:via-neutral-100/15 transition-colors " />
+                  </motion.div>
                 )}
 
                 {/* LABEL */}
@@ -127,13 +132,17 @@ export function ProfileTabs({
 
       {/* TAB CONTENT */}
       <TabsContent value="posts">
-        <Suspense fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}>
+        <Suspense
+          fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}
+        >
           <PostsTab username={username} />
         </Suspense>
       </TabsContent>
 
       <TabsContent value="comments">
-        <Suspense fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}>
+        <Suspense
+          fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}
+        >
           <CommentsTab username={username} />
         </Suspense>
       </TabsContent>
@@ -141,13 +150,17 @@ export function ProfileTabs({
       {isOwnProfile && (
         <>
           <TabsContent value="upvotes">
-            <Suspense fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}>
+            <Suspense
+              fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}
+            >
               <UpvotesTab username={username} />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="downvotes">
-            <Suspense fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}>
+            <Suspense
+              fallback={<Loader2 className="animate-spin h-6 w-6 mx-auto" />}
+            >
               <DownvotesTab username={username} />
             </Suspense>
           </TabsContent>

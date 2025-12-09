@@ -14,24 +14,18 @@ import { MessageSquare, Loader2, ArrowBigUpDash } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { PostSkeleton } from "./PostSkeleton";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Clock01Icon, Clock02Icon, Clock03Icon, Clock04Icon, Clock05Icon, Message02Icon } from "@hugeicons/core-free-icons";
-import { timeAgo } from "@/lib/utils/time";
-
-interface Post {
-  id: string;
-  title: string;
-  description: any;
-  votesCount: number;
-  createdAt: string;
-  uploadedImages: string[];
-  _count: {
-    comments: number;
-  };
-}
+import UserDetail from "@/app/(user)/idea/[id]/UserDetail";
+import axios from "axios";
+import { ProfilePost } from "@/types/profile";
+import VotesButton from "../Shared/VotesButton";
+import { useRouter } from "next/navigation";
+import CommentBox from "../Shared/CommentBox";
+import SaveIdea from "../Shared/SaveIdea";
+import IdeaCard from "../feed/IdeaCard";
+import { IdeaCardSkeleton } from "../feed/IdeaCardSkeleton";
 
 interface PostsResponse {
-  posts: Post[];
+  posts: ProfilePost[];
   nextCursor: string | null;
 }
 
@@ -45,15 +39,16 @@ async function fetchPosts(
   params.set("sortBy", sortBy);
   params.set("limit", "10");
 
-  const response = await fetch(
+  const response = await axios.get(
     `/api/profile/${username}/posts?${params.toString()}`
   );
-  if (!response.ok) throw new Error("Failed to fetch posts");
-  return response.json();
+  if (response.status !== 200) throw new Error("Failed to fetch posts");
+  return response.data;
 }
 
 export default function PostsTab({ username }: { username: string }) {
   const [sortBy, setSortBy] = useState("latest");
+  const router = useRouter();
 
   const {
     data,
@@ -73,7 +68,7 @@ export default function PostsTab({ username }: { username: string }) {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <PostSkeleton key={i} />
+          <IdeaCardSkeleton key={i} img={i % 2 !== 0} />
         ))}
       </div>
     );
@@ -90,6 +85,10 @@ export default function PostsTab({ username }: { username: string }) {
   }
 
   const posts = data?.pages.flatMap((page) => page.posts) ?? [];
+
+  console.log({
+    postsonprofile: posts,
+  });
 
   return (
     <div className="space-y-4">
@@ -113,26 +112,19 @@ export default function PostsTab({ username }: { username: string }) {
         </Card>
       ) : (
         <>
-          <div className=" flex gap-2 flex-col bg-background border-0">
+          <div className=" divide-border/50 divide-y p-1">
             {posts.map((post) => (
-              <Link key={post.id} href={`/idea/${post.id}`}>
-                <div className="p-4 border shadow hover:bg-accent/50 transition-colors bg-accent/20 rounded-xl ">
-                  <h3 className="text-lg font-semibold mb-2">{post.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <HugeiconsIcon icon={Clock05Icon} size={18} />
-                      <p>{timeAgo(post.createdAt)}</p>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <HugeiconsIcon icon={Message02Icon} size={18} />
-                      {post._count.comments}
-                    </span>
-                    <span className="flex items-center">
-                      <ArrowBigUpDash className="inline-block h-4 w-4 mr-1" />
-                       {post.votesCount}</span>
-                  </div>
-                </div>
-              </Link>
+              <IdeaCard key={post.id} 
+            id={post.id} 
+            votesCount={post.votesCount}
+            image={post.uploadedImages?.[0]}
+            userVote={post.votes}
+            avatar={post.author.image}
+            username={post.author.username}
+            title={post.title}
+            createdAt={post.createdAt}
+            commentsCount={post._count.comments}
+               />
             ))}
           </div>
 

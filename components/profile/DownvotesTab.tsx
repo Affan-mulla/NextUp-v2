@@ -4,30 +4,15 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { VoteSkeleton } from "./VoteSkeleton";
-
-interface Vote {
-  id: string;
-  type: "UP" | "DOWN";
-  createdAt: string;
-  idea: {
-    id: string;
-    title: string;
-    votesCount: number;
-    author: {
-      username: string;
-      name: string;
-      image: string | null;
-    };
-  };
-}
+import IdeaCard from "../feed/IdeaCard";
+import { ProfileVote } from "@/types/profile";
+import { IdeaCardSkeleton } from "../feed/IdeaCardSkeleton";
 
 interface VotesResponse {
-  votes: Vote[];
+  votes: ProfileVote[];
   nextCursor: string | null;
 }
 
@@ -73,7 +58,7 @@ export default function DownvotesTab({ username }: { username: string }) {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <VoteSkeleton key={i} />
+             <IdeaCardSkeleton key={i} img={i % 2 !== 0} />
         ))}
       </div>
     );
@@ -116,32 +101,19 @@ export default function DownvotesTab({ username }: { username: string }) {
           </CardContent>
         </Card>
       ) : (
-        <>
+        <div className="flex flex-col divide-y">
           {votes.map((vote) => (
-            <Link key={vote.id} href={`/idea/${vote.idea.id}`}>
-              <Card className="hover:bg-accent transition-colors cursor-pointer">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={vote.idea.author.image || undefined} />
-                      <AvatarFallback>
-                        {vote.idea.author.name.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold mb-1 line-clamp-2">
-                        {vote.idea.title}
-                      </h3>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span>by @{vote.idea.author.username}</span>
-                        <span>↑ {vote.idea.votesCount}</span>
-                        <span>{new Date(vote.createdAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+           <IdeaCard key={vote.id} 
+            id={vote.idea.id} 
+            votesCount={vote.idea.votesCount}
+            image={vote.idea.uploadedImages?.[0]}
+            userVote={vote.type}
+            avatar={vote.idea.author.image}
+            username={vote.idea.author.username}
+            title={vote.idea.title}
+            createdAt={vote.createdAt}
+            commentsCount={vote.idea._count.comments}
+               />
           ))}
 
           {hasNextPage && (
@@ -162,7 +134,7 @@ export default function DownvotesTab({ username }: { username: string }) {
               </Button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

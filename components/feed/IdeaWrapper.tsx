@@ -97,7 +97,7 @@ const IdeaWrapper = () => {
           image={idea.uploadedImages[0]}
           votesCount={idea.votesCount}
           commentsCount={idea._count.comments}
-          avatar={idea.author.image || undefined}
+          avatar={idea.author.image}
           username={idea.author.username}
           createdAt={idea.createdAt}
           userVote={idea.userVote}

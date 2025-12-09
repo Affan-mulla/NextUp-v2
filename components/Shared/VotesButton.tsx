@@ -12,11 +12,13 @@ const VotesButton = ({
   id: string;
   votesCount: number;
   userVoteType:
+    | null
+    | undefined
+    | VoteType
     | {
         type: VoteType;
       }
-    | null
-    | undefined;
+    ;
 }) => {
   /**
    * Get vote mutation from React Query
@@ -36,8 +38,8 @@ const VotesButton = ({
    * isUpvoted: true if user has upvoted this idea
    * isDownvoted: true if user has downvoted this idea
    */
-  const isUpvoted = userVoteType?.type === "UP";
-  const isDownvoted = userVoteType?.type === "DOWN";
+  const isUpvoted = userVoteType === "UP" || userVoteType?.type === "UP";
+  const isDownvoted = userVoteType === "DOWN" || userVoteType?.type === "DOWN";
 
   /**
    * Handle vote button click
@@ -58,7 +60,7 @@ const VotesButton = ({
   };
 
   return (
-    <div className="flex items-center bg-popover/90 hover:border-primary transition-colors border border-border rounded-md gap-0.5">
+    <div className="flex w-fit items-center bg-popover/90 hover:border-primary transition-colors border border-border rounded-md gap-0.5">
       {/* Upvote Button */}
 
       <Button
@@ -77,7 +79,7 @@ const VotesButton = ({
       >
         <ArrowBigUpDash
           size={10}
-          className={cn("transition-all", isUpvoted && "fill-current")}
+          className={cn("transition-all", isUpvoted && "fill-current", isUpvoted && "text-green-500")}
         />
       </Button>
 

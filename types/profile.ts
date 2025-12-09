@@ -19,7 +19,13 @@ export interface ProfilePost {
   title: string;
   description: any;
   votesCount: number;
+  votes: VoteType | undefined;
   createdAt: Date;
+  author: {
+    username: string;
+    name: string;
+    image: string | null;
+  };
   uploadedImages: string[];
   _count: {
     comments: number;
@@ -39,6 +45,20 @@ export interface ProfileComment {
     id: string;
     title: string;
   } | null;
+  votes: VoteType | undefined;
+  user:{
+    id: string;
+    username: string;
+    image: string | null;
+  
+  }
+    commentId: string | null;
+   parent : {
+    user:{
+      username:string;
+      image:string | null;
+    }
+   } | null;
 }
 
 export interface ProfileVote {
@@ -48,12 +68,16 @@ export interface ProfileVote {
   idea: {
     id: string;
     title: string;
+    uploadedImages?: string[];
     votesCount: number;
     author: {
       username: string;
       name: string;
       image: string | null;
     };
+    _count: {
+      comments: number;
+    }
   };
 }
 

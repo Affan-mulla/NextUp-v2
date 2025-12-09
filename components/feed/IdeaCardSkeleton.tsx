@@ -6,7 +6,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function IdeaCardSkeleton() {
+export function IdeaCardSkeleton({img} : {img?: boolean}) {
   return (
     <Card className="bg-background py-3 gap-4 border-0 rounded-none">
       {/* Header */}
@@ -21,7 +21,9 @@ export function IdeaCardSkeleton() {
       {/* Content */}
       <CardContent className="flex flex-col gap-2">
         <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-48 md:h-64 w-full rounded-xl" />
+        {
+          img && <Skeleton className="h-48 md:h-64 w-full rounded-xl" />
+        }
       </CardContent>
 
       {/* Footer */}
@@ -39,7 +41,7 @@ export function IdeaFeedSkeleton({ count = 3 }: { count?: number }) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <IdeaCardSkeleton key={i} />
+       <IdeaCardSkeleton key={i} img={i % 2 !== 0} />
       ))}
     </>
   );

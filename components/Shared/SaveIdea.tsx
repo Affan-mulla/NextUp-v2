@@ -8,11 +8,11 @@ const SaveIdea = () => {
     <Button
       variant={"link"}
       size={"icon-sm"}
-      className="border p-2 border-border bg-popover hover:border-primary transition-colors"
+      className="border p-2  border-border bg-popover hover:border-primary transition-colors"
     >
       <HugeiconsIcon
         icon={Bookmark01Icon}
-        className="size-4 text-foreground"
+        className="size-4 text-foreground "
         strokeWidth={1.5}
       />
     </Button>

@@ -5,7 +5,7 @@ import { timeAgo } from "@/lib/utils/time";
 
 interface IdeaProps {
   username: string;
-  time: string;
+  time: string | Date;
   avatar: string | null;
 }
 
@@ -38,7 +38,7 @@ const UserDetail = ({ username, time, avatar }: IdeaProps) => {
 
           <time 
             className="text-xs text-muted-foreground"
-            dateTime={time}
+            dateTime={typeof time === "string" ? time : time.toISOString()}
           >
             {timeAgo(time)}
           </time>
