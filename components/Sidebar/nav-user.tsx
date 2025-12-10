@@ -26,7 +26,7 @@
   import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
   import Togglemode from "../Theme/Toggle-mode";
   import { HugeiconsIcon } from "@hugeicons/react";
-  import { CreditCardIcon, Logout01Icon, Settings03Icon, Sun02FreeIcons, UserIcon } from "@hugeicons/core-free-icons";
+  import { CreditCardIcon, Logout01Icon, MoonEclipseIcon, Settings03Icon, Sun02FreeIcons, UserIcon } from "@hugeicons/core-free-icons";
   import { useSidebar } from "../ui/sidebar";
 import { Button } from "../ui/button";
 
@@ -118,7 +118,7 @@ import { Button } from "../ui/button";
                 type="button"
                 className={cn(
                   "flex items-center justify-between p-3 rounded-2xl bg-background border border-border hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-background/80 hover:shadow-sm transition-all duration-200 focus:outline-none w-full",
-                  !open && !isMobile && "p-0"
+                  !open && !isMobile && "p-0 border-0 bg-transparent hover:bg-transparent hover:shadow-none mb-2"
                 )}
               >
                 {open && (
@@ -133,16 +133,13 @@ import { Button } from "../ui/button";
                 )}
 
                 <div className="relative">
-                  <div className=" rounded-full bg-linear-to-br from-amber-50 via-orange-400 to-primary p-[2.5px]">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-background flex items-center justify-center">
-                      <Avatar>
+                  
+                      <Avatar className="border border-border size-9 hover:shadow-md transition-all duration-200">
                         <AvatarFallback>
                           {user.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                         <AvatarImage src={user.avatar} />
                       </Avatar>
-                    </div>
-                  </div>
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -181,7 +178,7 @@ import { Button } from "../ui/button";
             <DropdownMenuContent
               side="top" 
               sideOffset={4}
-              className="w-64 p-2 bg-background/60 backdrop-blur-sm border  border-border rounded-xl shadow-xl shadow-zinc-900/5 dark:shadow-zinc-950/20 
+              className="w-64 py-2 px-1 bg-background/60 backdrop-blur-sm border  border-border rounded-xl shadow-xl shadow-zinc-900/5 dark:shadow-zinc-950/20 
                       data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-top-right"
             >
               <div className="space-y-1">
@@ -189,7 +186,7 @@ import { Button } from "../ui/button";
                   <DropdownMenuItem key={item.label} asChild>
                     <Link
                       href={item.href}
-                      className="flex items-center px-2 py-2  rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50"
+                      className="flex items-center px-2 py-2  rounded-xl transition-all duration-200 cursor-pointer group border border-transparent hover:border-border"
                     >
                       <div className="flex items-center gap-2 flex-1">
                           {item.icon}
@@ -219,9 +216,9 @@ import { Button } from "../ui/button";
               <DropdownMenuSeparator className=" bg-linear-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-800" />
 
               <DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-                <div className="flex items-center  hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50">
+                <div className="flex items-center  hover:bg-popover rounded-xl transition-all duration-200 cursor-pointer group border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50">
                   <div className="flex items-center gap-2 flex-1">
-                    <HugeiconsIcon icon={Sun02FreeIcons} className="size-[18px]" />
+                    <HugeiconsIcon icon={MoonEclipseIcon} className="size-[18px]" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight whitespace-nowrap  transition-colors">
                       Theme
                     </span>
@@ -238,7 +235,7 @@ import { Button } from "../ui/button";
                   onClick={handleSignOut}
                   disabled={isLoggingOut}
                  variant="ghost"
-                 className="w-full rounded-xl justify-start hover:bg-destructive border border-transparent hover:border-red-200/50 dark:hover:border-red-700/50 transition-all duration-200 cursor-pointer "
+                 className="w-full rounded-xl justify-start hover:bg-destructive border border-transparent hover:border-red-200 dark:hover:border-red-700/50 transition-all duration-200 cursor-pointer "
                 >
                   {isLoggingOut ? (
                     <>

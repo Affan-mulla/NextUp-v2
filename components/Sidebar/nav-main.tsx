@@ -66,7 +66,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                 >
                   {
                     isActive && (
-                      <span className="absolute shadow-[inset_0_1px_1px_rgba(0,0,0,0.2),inset_0_-1px_1px_rgba(0,0,0,0.2)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] h-full inset-0 w-full rounded-md"></span>
+                      <span className="absolute shadow-[inset_0_1px_1px_rgba(0,0,0,0.1),inset_0_-1px_1px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] h-full inset-0 w-full rounded-md"></span>
                     )
 
                   }
