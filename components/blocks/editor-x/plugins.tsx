@@ -214,7 +214,6 @@ export function Plugins({}) {
           ]}
         />
         <TabFocusPlugin />
-        <AutocompletePlugin />
         <AutoLinkPlugin />
         <LinkPlugin />
 

@@ -82,11 +82,7 @@ export default function CommentSection({
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Comments</h2>
-        </div>
-        
+      <div className="space-y-4 mt-2">
         <CommentForm ideaId={ideaId} />
         
         <div className="space-y-3 mt-6">
@@ -101,11 +97,7 @@ export default function CommentSection({
   // Empty state
   if (totalComments === 0) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Comments</h2>
-        </div>
-        
+      <div className="space-y-4 mt-2">
         <CommentForm ideaId={ideaId} />
         
         <div className="text-center py-12">
@@ -126,15 +118,6 @@ export default function CommentSection({
   // Comments display
   return (
     <div className="space-y-4 mt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
-          Comments
-          <span className="text-muted-foreground ml-2 text-sm font-normal">
-            ({totalComments})
-          </span>
-        </h2>
-      </div>
 
       {/* Comment Form */}
       <CommentForm ideaId={ideaId} />

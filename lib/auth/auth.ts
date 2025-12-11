@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "../prisma";
-
+import { sendVerificationEmail } from "../email";
+import { createVerificationToken } from "../utils/verification";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -11,15 +12,24 @@ export const auth = betterAuth({
         user: {
             create: {
                 before: async (user, ctx) => {
-                    // Derive username from email only if client didn't provide one.
                     const derivedUsername = user.username ?? (user.email ? user.email.split("@")[0] : undefined);
 
                     return {
                         data: {
                             ...user,
                             ...(derivedUsername ? { username: derivedUsername } : {}),
+                            emailVerified: false,
                         },
                     };
+                },
+                after: async (user) => {
+                    if (user.email) {
+                        const token = await createVerificationToken(user.email);
+                        await sendVerificationEmail({
+                            email: user.email,
+                            token,
+                        });
+                    }
                 },
             },
         },
@@ -31,12 +41,17 @@ export const auth = betterAuth({
                 required: false,
                 unique: true,
             },
+            emailVerified: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
+            },
         },
     },
     emailAndPassword:{
         enabled: true,
-        requireEmailVerification:false,
-        minPasswordLength:6,
+        requireEmailVerification: false,
+        minPasswordLength: 6,
     },
     
     socialProviders: {

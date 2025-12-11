@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { debounce } from "@/utils/debounce"
 import { cn } from "@/lib/utils"
+import axios from "axios"
+import Link from "next/link"
 
 interface SearchUser {
   id: string
@@ -79,11 +81,8 @@ export const UnifiedSearchBar: React.FC = () => {
         }
 
         try {
-          const res = await fetch(`/api/search?q=${encodeURIComponent(value)}`, {
-            method: "GET",
-          })
-          if (!res.ok) throw new Error("Failed to search")
-          const json = (await res.json()) as SearchResponse
+          const res = await axios.get(`/api/search?q=${encodeURIComponent(value)}`)
+          const json = res.data as SearchResponse
           setResults(json)
         } catch (error) {
           console.error(error)
@@ -186,27 +185,27 @@ export const UnifiedSearchBar: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-md border-4 dark:border-foreground/10 border-primary/15 rounded-[14.5px]"
+      className="relative w-full max-w-md "
     >
 
       <Input
         ref={inputRef}
-        placeholder="Search users or products…"
+        placeholder="Find users or products..."
         value={query}
         onChange={handleChange}
         onFocus={() => query && setIsOpen(true)}
         onKeyDown={handleKeyDown}
-        className="bg-background/80 text-foreground h-10 rounded-lg border-2    focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
+        className="bg-popover text-xs text-foreground h-9 rounded-lg border dark:border-border shadow-[0_2px_2px_-2px_rgba(0,0,0,0.2)] border-accent-foreground/15 focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
       />
 
       <AnimatePresence>
         {isOpen && (query || loading) && (
           <motion.div
-            initial={{ opacity: 0, y: 4 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
+            exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-border bg-background/30 backdrop-blur-xl shadow-none"
+            className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-accent bg-linear-to-b from-white/5 to-transparent backdrop-blur-xl shadow"
           >
             <ScrollArea className="max-h-80 rounded-lg">
               <div className="p-2 text-sm">
@@ -240,7 +239,7 @@ export const UnifiedSearchBar: React.FC = () => {
                             const isActive =
                               activeGroup === "user" && activeIndex === globalIndex
                             return (
-                              <button
+                              <Link href={`/u/${user.username}`}
                                 key={user.id}
                                 type="button"
                                 className={cn(
@@ -270,7 +269,7 @@ export const UnifiedSearchBar: React.FC = () => {
                                     <Highlight text={user.email} query={query} />
                                   </span>
                                 </div>
-                              </button>
+                              </Link>
                             )}
                           )}
                         </div>
@@ -332,7 +331,7 @@ export const UnifiedSearchBar: React.FC = () => {
                 )}
 
                 {!loading && !hasResults && query && (
-                  <div className="py-4 text-center text-xs text-muted-foreground">
+                  <div className="py-4 text-center text-xs text-muted-foreground ">
                     No results found
                   </div>
                 )}

@@ -1,4 +1,4 @@
-import { VoteType } from "@/hooks/useVoting";
+import { UserVoteType } from "./VoteType";
 
 export interface IdeaById {
   author: Author;
@@ -10,13 +10,10 @@ export interface IdeaById {
   uploadedImages: string[] | [];
   userId: string;
   votesCount: number;
-  userVote?: {
-    type: VoteType;
-  } | null;
-  // Legacy field for backward compatibility
-  userVoteType?: {
-    type: VoteType;
-  } | null;
+  _count?: {
+    comments: number;
+  };
+  userVote?: UserVoteType;
 }
 
 interface Author {

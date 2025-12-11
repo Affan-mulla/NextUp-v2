@@ -55,16 +55,17 @@ function AddProductButton() {
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.96 }}
       transition={{ type: "spring", stiffness: 350, damping: 18 }}
-      className={cn("dark:border-foreground/20 border-primary/20 border-4 rounded-[12px] drop-shadow-xl  drop-shadow-secondary" , !open && "border-2"
+      className={cn("mt-2" , 
   )}>
       <Button
+      variant={"default"}
         className="
-          w-full border-2 dark:border-foreground/30 border-background/20 px-3 py-2 
-          transition-all duration-200"
-          size={`${open ? "default" : "icon-sm"}`}
+          w-full
+          transition-transform duration-200"
+          size={`${open ? "sm" : "icon-sm"}`}
       >
         <motion.div>
-          <HugeiconsIcon icon={AddSquareIcon} className={cn("size-6", !open && "size-5")} />
+          <HugeiconsIcon icon={AddSquareIcon} className={cn("size-5", !open && "size-5")} strokeWidth={2} />
         </motion.div>
 
         {open && (

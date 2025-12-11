@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * Get Comments API Route
  * Cursor-based pagination for top-level comments with user votes
@@ -13,7 +15,7 @@ const MAX_LIMIT = 100;
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const ideaId = searchParams.get("ideaId");
     const cursor = searchParams.get("cursor");
     const limitParam = searchParams.get("limit");

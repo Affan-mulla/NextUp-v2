@@ -1,18 +1,40 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { SerializedEditorState } from "lexical";
-import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ZoomIn,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WrapperDescriptionDisplay from "./DescriptionDisplay";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Image from "next/image";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowLeft02Icon,
+  ArrowRight01Icon,
+  ArrowRight02Icon,
+} from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 
 interface EnhancedDescriptionDisplayProps {
   content: SerializedEditorState | undefined;
   uploadedImages: string[];
 }
 
-const EnhancedDescriptionDisplay = ({ 
-  content, 
-  uploadedImages 
+const EnhancedDescriptionDisplay = ({
+  content,
+  uploadedImages,
 }: EnhancedDescriptionDisplayProps) => {
   const [images] = useState<string[]>(uploadedImages);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -36,9 +58,7 @@ const EnhancedDescriptionDisplay = ({
 
   const prevImage = useCallback(() => {
     if (!hasImages) return;
-    setCurrentImageIndex((prev) => 
-      (prev - 1 + images.length) % images.length
-    );
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   }, [images.length, hasImages]);
 
   const goToImage = useCallback((index: number) => {
@@ -101,7 +121,6 @@ const EnhancedDescriptionDisplay = ({
     }
   };
 
-
   return (
     <div className="w-full space-y-8">
       {/* Description Text First */}
@@ -113,128 +132,113 @@ const EnhancedDescriptionDisplay = ({
 
       {/* Images Gallery Below Description */}
       {images.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-primary rounded-full"></div>
-            <h3 className="text-lg font-outfit font-semibold text-foreground">
-              Images ({images.length})
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className="relative group cursor-pointer rounded-xl overflow-hidden bg-muted/20 border border-border/30 hover:border-border/60 transition-all duration-300 shadow-sm hover:shadow-md"
-                onClick={() => openCarousel(index)}
-              >
-                <img
-                  src={image}
-                  alt={`Image ${index + 1}`}
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+        <>
+          <Carousel className=" rounded-lg ">
+            <CarouselContent className=" rounded-xl">
+              {images.map((image, index) => (
+                <CarouselItem
+                  key={index}
+                  className=" relative  "
+                  onClick={() => openCarousel(index)}
+                >
+                  <div className="flex  rounded-2xl justify-center overflow-hidden items-center relative z-50  h-full w-full  cursor-pointer">
+
+                      <img
+                        src={image}
+                        alt=""
+                        className="max-h-[85vh] max-w-full object-contain  select-none relative z-20 "
+                        draggable={false}
                       />
-                    </svg>
+                    <img
+                      src={image}
+                      alt=""
+                      className="h-full w-full select-none absolute z-10  blur-xl"
+                      draggable={false}
+                    />
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </>
       )}
 
       {/* Image Carousel Modal */}
       {isCarouselOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-          <div className="relative max-w-4xl max-h-[90vh] w-full">
-            {/* Close Button */}
+          <div>
             <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 text-white"
+              variant="secondary"
+              className="absolute top-6 right-6   px-4 py-2 rounded-lg"
               onClick={closeCarousel}
             >
-              <X className="w-6 h-6" />
+              <X className="h-6 w-6" />
             </Button>
 
-            {/* Navigation Buttons */}
-            {images.length > 1 && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white"
-                  onClick={prevImage}
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white"
-                  onClick={nextImage}
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </Button>
-              </>
-            )}
+            <div className=" absolute top-6 left-6 bg-secondary  px-4 py-2 border border-border rounded-lg">
+              <p className="text-sm">
+                {currentImageIndex + 1} / {images.length}
+              </p>
+            </div>
 
-            {/* Main Image */}
             <div
-              className="flex items-center justify-center h-full"
+              className=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]  flex items-center justify-center cursor-pointer select-none"
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
             >
               <img
                 src={images[currentImageIndex]}
-                alt={`Image ${currentImageIndex + 1}`}
-                className="max-w-full max-h-full object-contain rounded-lg select-none"
                 draggable={false}
+                className="max-h-[80vh] max-w-[90vw]"
               />
             </div>
 
-            {/* Thumbnail Navigation */}
-            {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-white/20 backdrop-blur-sm rounded-lg p-2">
+            {hasMultipleImages && (
+              <>
+                <Button
+                  variant="ghost"
+                  className="absolute top-1/2 left-4 -translate-y-1/2"
+                  onClick={prevImage}
+                  size={"icon-lg"}
+                >
+                  <HugeiconsIcon
+                    icon={ArrowLeft02Icon}
+                    className="size-5"
+                    strokeWidth={2}
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="absolute top-1/2 right-4 -translate-y-1/2"
+                  onClick={nextImage}
+                  size={"icon-lg"}
+                >
+                  <HugeiconsIcon
+                    icon={ArrowRight02Icon}
+                    className="size-5"
+                    strokeWidth={2}
+                  />
+                </Button>
+              </>
+            )}
+
+            {hasMultipleImages && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
                 {images.map((_, index) => (
-                  <button
+                  <div
                     key={index}
-                    className={`w-12 h-12 rounded-md overflow-hidden transition-opacity duration-200 ${
-                      index === currentImageIndex
-                        ? "opacity-100 ring-2 ring-white"
-                        : "opacity-60 hover:opacity-100"
-                    }`}
-                    onClick={() => goToImage(index)}
-                  >
-                    <img
-                      src={images[index]}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                    className={cn(
+                      "h-2 w-2 rounded-full bg-white/50 cursor-pointer",
+                      index === currentImageIndex ? "bg-primary" : "bg-white/50"
+                    )}
+                    onClick={() => setCurrentImageIndex(index)}
+                  />
                 ))}
               </div>
             )}
-
-            {/* Image Counter */}
-            <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-sm">
-              {currentImageIndex + 1} / {images.length}
-            </div>
           </div>
         </div>
       )}

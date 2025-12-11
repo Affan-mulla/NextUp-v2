@@ -22,13 +22,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import CommentAction from "./CommentAction";
 import { useUserField } from "@/lib/store/user-store";
 import { toast } from "sonner";
+import Link from "next/link";
 
 function ThreadGutter({ depth ,hasReplies }: { depth: number, hasReplies?: boolean }) {
   return (
-    <div className={cn("absolute inset-y-2  flex", depth === 0 ? "-left-1" : "left-6", !hasReplies && "block",    )}>
+    <div className={cn("absolute inset-y-3  flex", depth === 0 ? "-left-1" : "left-6", !hasReplies && "block",    )}>
        {
         ( depth !== 0  ) && (
-         <div className=" h-4 w-10 border-l border-border border-b-2 rounded-b-xl  absolute -left-10 top-1" />
+         <div className=" h-4 w-10 border-l border-border border-b-2 rounded-bl-xl  absolute -left-10 top-1" />
         )
       }
         <div
@@ -152,9 +153,11 @@ function CommentComponent({
         <div className="flex-1 min-w-0">
           {/* User Info */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-foreground">
+            <Link href={`/u/${comment.user.username}`}>
+            <span className="text-sm font-medium text-foreground hover:text-primary transition-colors">
               {comment.user.username}
             </span>
+            </Link>
             <span className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(comment.createdAt), {
                 addSuffix: true,
@@ -221,10 +224,10 @@ function CommentComponent({
               {canNest && !isDeleted && (
                 <Button
                   variant="ghost"
-                  className="text-muted-foreground hover:text-foreground h-7 px-2 text-xs"
+                  className=" h-7 px-2 text-xs"
                   onClick={toggleReplyForm}
                 >
-                  <HugeiconsIcon icon={Message01Icon} size={"20px"} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={Message01Icon} className="size-4 text-muted-foreground"  />
                   Reply
                 </Button>
               )}

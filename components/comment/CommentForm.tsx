@@ -133,7 +133,7 @@ export default function CommentForm({
           <Avatar className="h-8 w-8 shrink-0 mt-1">
               <AvatarImage src={avatar} alt={username || "User"} className="object-cover" />
               <AvatarFallback>
-                <User className="w-4 h-4 text-muted-foreground" />
+                {username?.slice(0, 1).toUpperCase()}
               </AvatarFallback>
           </Avatar>
 

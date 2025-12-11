@@ -1,0 +1,1 @@
+export type UserVoteType = "UP" | "DOWN" | null | undefined;

@@ -15,20 +15,20 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
-  CardAction,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Comment03Icon } from "@hugeicons/core-free-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import {  type VoteType } from "@/hooks/useVoting";
 import { useRouter } from "next/navigation";
 import VotesButton from "../Shared/VotesButton";
+import CommentBox from "../Shared/CommentBox";
+import SaveIdea from "../Shared/SaveIdea";
+import { UserVoteType } from "@/types/VoteType";
+
 
 // ============================================================================
 // TypeScript Types
@@ -40,12 +40,10 @@ interface IdeaCardProps {
   image?: string;
   votesCount: number;
   commentsCount: number;
-  avatar?: string;
+  avatar: string | null;
   username: string;
-  createdAt: string;
-  userVote?: {
-    type: VoteType;
-  } | null;
+  createdAt: string | Date;
+  userVote?: UserVoteType;
 }
 
 // ============================================================================
@@ -78,15 +76,15 @@ const IdeaCard = ({
 
   return (
     <div className="">
-      <Card className="bg-background py-3 border-0 rounded-none transition-all duration-200 hover:bg-accent/30 cursor-pointer"
+      <Card className="bg-background py-3 gap-4 border-0 shadow-none rounded-none transition-colors duration-200 dark:hover:bg-secondary/20 hover:bg-secondary  cursor-pointer"
         onClick={() => {  
           router.push(`/idea/${id}`);
         }}
       >
         {/* Header */}
-        <CardHeader className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={avatar} />
+        <CardHeader className="flex items-center gap-2">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={avatar || undefined} />
             <AvatarFallback>{username.substring(0, 1).toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
 
@@ -103,7 +101,7 @@ const IdeaCard = ({
         </CardHeader>
 
         {/* Content */}
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-2">
           <CardTitle className="font-outfit text-lg md:text-xl font-semibold">
             {title}
           </CardTitle>
@@ -123,15 +121,14 @@ const IdeaCard = ({
         </CardContent>
 
         {/* Footer */}
-        <CardFooter className="flex justify-between items-center">
+        <CardFooter className="flex items-center gap-2 h-8">
           {/* Votes */}
-         <VotesButton id={id} votesCount={votesCount} userVoteType={userVote} />
+         <VotesButton id={id} votesCount={votesCount} userVoteTypeProps={userVote} />
 
           {/* Comments */}
-          <CardAction className="flex items-center gap-2 bg-card border border-border px-3 py-2 rounded-md">
-            <HugeiconsIcon icon={Comment03Icon} className="size-4" />
-            <span className="text-sm font-medium">{commentsCount}</span>
-          </CardAction>
+          <CommentBox commentsCount={commentsCount} />
+
+          <SaveIdea />
         </CardFooter>
       </Card>
     </div>

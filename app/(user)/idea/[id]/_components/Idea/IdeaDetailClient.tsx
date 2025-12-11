@@ -12,6 +12,8 @@ import { useIdeaDetail } from "@/hooks/useIdeaDetail";
 import { IdeaDetailSkeleton } from "./IdeaDetailSkeleton";
 import CommentForm from "../comment/CommentForm";
 import CommentSection from "../comment/CommentSection";
+import SaveIdea from "@/components/Shared/SaveIdea";
+import CommentBox from "@/components/Shared/CommentBox";
 
 interface IdeaDetailClientProps {
   id: string;
@@ -38,56 +40,55 @@ export default function IdeaDetailClient({ id }: IdeaDetailClientProps) {
 
   return (
     <div className=" bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          {/* Left side: back + user/product */}
-          <div className="flex items-center gap-3">
-            <BackButton />
-
-            <UserDetail
-              username={idea.author.username}
-              time={idea.createdAt}
-              avatar={idea.author.image}
-            />
+      <div className="max-w-4xl mx-auto px-4 py-6 flex gap-2 w-full">
+        <BackButton />
+        <div className="w-full">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-2">
+            {/* Left side: back + user/product */}
+            <div className="">
+              <UserDetail
+                username={idea.author.username}
+                time={idea.createdAt}
+                avatar={idea.author.image}
+              />
+            </div>
           </div>
 
-          {/* Right side: voting and options */}
-          <div className="flex items-center gap-2">
-            {/* votes */}
-            <VotesButton
-              id={idea.id}
-              votesCount={idea.votesCount}
-              userVoteType={idea.userVote}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-muted transition-colors"
-              aria-label="More options"
-            >
-              <HugeiconsIcon icon={MoreHorizontalIcon} />
-            </Button>
-          </div>
+          {/* Main Content */}
+          <main className="">
+            {/* Title */}
+            <h1 className="text-2xl font-outfit font-semibold tracking-wide ">
+              {idea.title}
+            </h1>
+
+            {/* Description */}
+            <div className="w-full">
+              <EnhancedDescriptionDisplay
+                content={idea.description as any}
+                uploadedImages={idea.uploadedImages}
+              />
+            </div>
+
+            {/* Bottom side: voting and options */}
+            <div className="flex items-center gap-2 mt-6  ">
+              {/* votes */}
+              <VotesButton
+                id={idea.id}
+                votesCount={idea.votesCount}
+                userVoteTypeProps={idea.userVote}
+              />
+
+              {/* Comments */}
+              <CommentBox commentsCount={idea._count?.comments } />
+              {/* save idea */}
+              <SaveIdea />
+
+            </div>
+          </main>
+
+          <CommentSection ideaId={idea.id} />
         </div>
-
-        {/* Main Content */}
-        <main className="bg-card rounded-xl border border-border/50 p-6 shadow-sm">
-          {/* Title */}
-          <h1 className="text-3xl font-outfit font-semibold mb-6 leading-tight">
-            {idea.title}
-          </h1>
-
-          {/* Description */}
-          <div className="w-full">
-            <EnhancedDescriptionDisplay
-              content={idea.description as any}
-              uploadedImages={idea.uploadedImages}
-            />
-          </div>
-        </main>
-
-        <CommentSection ideaId={idea.id} />
       </div>
     </div>
   );
