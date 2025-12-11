@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * API route for fetching ideas with pagination
  * GET /api/ideas?cursor={timestamp}

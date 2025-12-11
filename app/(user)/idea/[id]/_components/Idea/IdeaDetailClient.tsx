@@ -76,7 +76,7 @@ export default function IdeaDetailClient({ id }: IdeaDetailClientProps) {
               <VotesButton
                 id={idea.id}
                 votesCount={idea.votesCount}
-                userVoteType={idea.userVote}
+                userVoteTypeProps={idea.userVote}
               />
 
               {/* Comments */}

@@ -8,8 +8,8 @@ import { createClient } from "@/utils/supabase/server";
 import { cache } from "react";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import { VoteType } from "@/hooks/useVoting";
 import { IdeaById } from "@/types/Idea";
+import { UserVoteType } from "@/types/VoteType";
 
 export interface IdeaWithAuthor {
   id: string;
@@ -29,9 +29,7 @@ export interface IdeaWithAuthor {
   _count: {
     comments: number;
   };
-  userVote?: {
-    type: "UP" | "DOWN";
-  } | null;
+  userVote?:  UserVoteType;
 }
 
 export interface IdeasResponse {
@@ -116,7 +114,7 @@ export const getIdeas = cache(
             .eq("ideaId", idea.id)
             .maybeSingle();
 
-          userVote = vote;
+          userVote = vote?.type || null;
         }
 
         // Ensure author is a single object, not an array
@@ -214,7 +212,7 @@ export const getIdeaById = cache(async (id: string): Promise<IdeaById> => {
       .eq("ideaId", idea.id)
       .maybeSingle();
 
-    userVote = vote;
+    userVote = vote?.type || null;
   }
 
   return {
@@ -224,6 +222,5 @@ export const getIdeaById = cache(async (id: string): Promise<IdeaById> => {
       comments: commentCount || 0,
     },
     userVote,
-    userVoteType: userVote, // Legacy field for backward compatibility
   } as IdeaById;
 });

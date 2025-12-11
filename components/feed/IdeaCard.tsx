@@ -23,11 +23,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import {  type VoteType } from "@/hooks/useVoting";
 import { useRouter } from "next/navigation";
 import VotesButton from "../Shared/VotesButton";
 import CommentBox from "../Shared/CommentBox";
 import SaveIdea from "../Shared/SaveIdea";
+import { UserVoteType } from "@/types/VoteType";
+
 
 // ============================================================================
 // TypeScript Types
@@ -42,7 +43,7 @@ interface IdeaCardProps {
   avatar: string | null;
   username: string;
   createdAt: string | Date;
-  userVote?: VoteType;
+  userVote?: UserVoteType;
 }
 
 // ============================================================================
@@ -122,7 +123,7 @@ const IdeaCard = ({
         {/* Footer */}
         <CardFooter className="flex items-center gap-2 h-8">
           {/* Votes */}
-         <VotesButton id={id} votesCount={votesCount} userVoteType={userVote} />
+         <VotesButton id={id} votesCount={votesCount} userVoteTypeProps={userVote} />
 
           {/* Comments */}
           <CommentBox commentsCount={commentsCount} />

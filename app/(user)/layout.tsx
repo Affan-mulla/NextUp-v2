@@ -15,7 +15,7 @@ import { UnifiedSearchBar } from "@/components/search/UnifiedSearchBar";
 import { Button } from "@/components/ui/button";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-  "use cache";
+
 
   return (
     <SidebarProvider>

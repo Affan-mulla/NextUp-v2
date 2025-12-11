@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 /**
  * Get Replies API Route
  * Fetches replies for a specific comment with user votes
@@ -13,7 +15,7 @@ const MAX_LIMIT = 50;
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const commentId = searchParams.get("commentId");
     const cursor = searchParams.get("cursor");
     const limitParam = searchParams.get("limit");

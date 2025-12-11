@@ -3,21 +3,16 @@ import { ArrowBigDownDash, ArrowBigUpDash } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useIsVotingIdea, useVoteIdea, VoteType } from "@/hooks/useVoting";
+import { UserVoteType } from "@/types/VoteType";
 
 const VotesButton = ({
   id,
   votesCount,
-  userVoteType,
+  userVoteTypeProps,
 }: {
   id: string;
   votesCount: number;
-  userVoteType:
-    | null
-    | undefined
-    | VoteType
-    | {
-        type: VoteType;
-      }
+  userVoteTypeProps?: UserVoteType
     ;
 }) => {
   /**
@@ -38,8 +33,8 @@ const VotesButton = ({
    * isUpvoted: true if user has upvoted this idea
    * isDownvoted: true if user has downvoted this idea
    */
-  const isUpvoted = userVoteType === "UP" || userVoteType?.type === "UP";
-  const isDownvoted = userVoteType === "DOWN" || userVoteType?.type === "DOWN";
+  const isUpvoted = userVoteTypeProps === "UP"
+  const isDownvoted = userVoteTypeProps === "DOWN";
 
   /**
    * Handle vote button click

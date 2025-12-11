@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, XCircle, Clock, Loader2, Mail } from "lucide-react";
+import VerifyEmailLoading from "./loading";
 
 type VerificationState = "loading" | "success" | "invalid" | "expired" | "already-verified" | "error" | "check-email";
 
-export default function VerifyEmailPage() {
+export default function verifyEmailPage() {
+  return <Suspense fallback={
+    <VerifyEmailLoading />
+  }>
+    <VerifyEmailComp />
+  </Suspense>
+};
+ function VerifyEmailComp() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [state, setState] = useState<VerificationState>("loading");
