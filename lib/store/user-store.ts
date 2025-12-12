@@ -18,6 +18,7 @@ export interface User {
   createdAt?: string;
   emailVerified?: boolean;
   image?: string;
+  username?: string;
 }
 
 /**

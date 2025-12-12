@@ -86,5 +86,6 @@ export function mapSessionUser(
     avatar: sessionUser.image || undefined,
     emailVerified: sessionUser.emailVerified,
     createdAt: sessionUser.createdAt?.toISOString(),
+    username: (sessionUser as any).username,
   };
 }

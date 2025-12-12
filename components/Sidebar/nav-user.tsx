@@ -2,8 +2,6 @@
 
   import * as React from "react";
   import { cn } from "@/lib/utils";
-  import { Settings, CreditCard, FileText, LogOut, User } from "lucide-react";
-  import Image from "next/image";
   import Link from "next/link";
   import {
     DropdownMenu,
@@ -46,6 +44,7 @@ import { Button } from "../ui/button";
 
     // Get user from Zustand store
     const user = useUser();
+    console.log("NavUser render - user :", user?.avatar);
     const { clearUser } = useUserActions();
     const isHydrated = useIsHydrated();
     const isLoading = useIsLoading();
@@ -71,7 +70,7 @@ import { Button } from "../ui/button";
     const menuItems: MenuItem[] = [
       {
         label: "Profile",
-        href: `/u/${user.name}`,
+        href: `/u/${user.username}`,
         icon: <HugeiconsIcon icon={UserIcon} className="size-[18px]"  />
       },
       {

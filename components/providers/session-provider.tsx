@@ -42,11 +42,9 @@ export function SessionProvider({
   const { data: sessionUser, isLoading: queryLoading } = useSessionQuery({
     staleTime: 1000 * 60 * 5, // 5 minutes
     onSuccess: (user) => {
-      if (debugRef.current) {
-      }
       hydrateFromSession(user)
       setLoading(false)
-      if (debugRef.current && user) console.log("✅ Session hydrated:", user.email)
+      if (debugRef.current && user) console.log("✅ Session hydrated:", user)
       if (debugRef.current && !user) console.log("⚠️ No active session found")
     }
   })
@@ -62,6 +60,8 @@ useEffect(() => {
   if (!isHydrated) return
   if (queryLoading) return
   if (sessionUser !== undefined) {
+    console.log({"SessionUser": sessionUser});
+    
     hydrateFromSession(sessionUser ?? null)
     setLoading(false)
     isInitialized.current = true

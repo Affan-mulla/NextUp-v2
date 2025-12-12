@@ -4,6 +4,7 @@ import { useState, lazy, Suspense } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import TabPillNavigation from "../Shared/TabPillNavigation";
 
 const PostsTab = lazy(() => import("./PostsTab"));
 const CommentsTab = lazy(() => import("./CommentsTab"));
@@ -42,93 +43,7 @@ export function ProfileTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <div className="relative h-13 rounded-full p-2 mb-4">
-        {/* OUTER SHELL — theme aware */}
-        <div
-          className="absolute inset-0 rounded-full 
-          bg-gradient-to-b from-secondary to-secondary/90
-          dark:bg-gradient-to-b dark:from-sidebar dark:to-sidebar/80
-          dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)]"
-        />
-
-        <div
-          className="absolute inset-[3px] rounded-full
-          bg-gradient-to-b from-card to-card/90
-          shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]
-          dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
-        />
-
-        {/* GLASS FULL-WIDTH */}
-        {hoverTab === null && (
-          <motion.div
-            layoutId="glass"
-            transition={glassSpring}
-            className="absolute inset-1.5 rounded-full 
-            bg-foreground/5 dark:bg-foreground/10 
-            backdrop-blur-sm border border-border/40
-            dark:shadow-[0_6px_18px_rgba(0,0,0,0.35)] z-10"
-          />
-        )}
-
-        {/* TABS */}
-        <div className="relative z-20 grid h-full grid-cols-4">
-          {tabs.map((tab, idx) => {
-            const isActive = tab.value === activeTab;
-            const isHover = hoverTab === idx;
-
-            return (
-              <button
-                key={tab.value}
-                onPointerEnter={() => setHoverTab(idx)}
-                onPointerLeave={() => setHoverTab(null)}
-                onClick={() => setActiveTab(tab.value)}
-                aria-pressed={isActive}
-                className="relative flex items-center justify-center cursor-pointer select-none"
-              >
-                {/* GLASS FOLLOW PILL */}
-                {isHover && (
-                  <motion.div
-                    layoutId="glass"
-                    transition={glassSpring}
-                    className="absolute inset-y-0 inset-x-1 rounded-full 
-                    bg-foreground/5 dark:bg-foreground/10
-                    backdrop-blur-sm border border-border/40 
-                    dark:shadow-[0_6px_18px_rgba(0,0,0,0.35)] z-10"
-                  />
-                )}
-
-                {/* ACTIVE PILL */}
-                {isActive && (
-                  <motion.div
-                    layoutId="active-pill"
-                    transition={activeSpring}
-                    className="absolute inset-1 rounded-full 
-                    bg-gradient-to-b  h-full top-0
-                    from-primary/90 to-primary 
-                    dark:from-primary/80 dark:to-primary/90
-                    
-                    border border-border/40 z-20"
-                  >
-                    <div className=" absolute inset-0 z-0  bg-linear-to-b from-neutral-50/20 via-neutral-100/10  to-transparent h-full rounded-2xl dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:from-neutral-50/25 hover:via-neutral-100/15 transition-colors " />
-                  </motion.div>
-                )}
-
-                {/* LABEL */}
-                <span
-                  className={`relative z-30 text-sm font-medium transition-colors
-                ${
-                  isActive
-                    ? "text-primary-foreground dark:text-primary-foreground"
-                    : "text-muted-foreground"
-                }`}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <TabPillNavigation tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
       {/* TAB CONTENT */}
       <TabsContent value="posts">
