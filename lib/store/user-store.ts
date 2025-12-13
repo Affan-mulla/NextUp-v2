@@ -7,74 +7,54 @@ import { useShallow } from 'zustand/react/shallow';
 // ============================================================================
 
 /**
- * User data shape - extend this with additional fields as needed
+ * User profile data shape
+ * Populated from /api/me (database), NOT from auth session
+ * 
+ * Architecture:
+ * - Auth session = identity only (id, email)
+ * - This interface = full profile from database
  */
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role?: string;
-  createdAt?: string;
-  emailVerified?: boolean;
-  image?: string;
   username?: string;
+  avatar?: string;
+  bio?: string;
+  role?: string;
+  emailVerified?: boolean;
+  createdAt?: string;
 }
 
 /**
- * User store state interface
+ * Store state
  */
 interface UserState {
   user: User | null;
-  isAuthenticated: boolean;
-  isHydrated: boolean; // Track if store has been hydrated from storage
-  isLoading: boolean; // Track if session is being fetched
+  isHydrated: boolean;
+  isLoading: boolean;
 }
 
 /**
- * User store actions interface
+ * Store actions
  */
 interface UserActions {
-  /**
-   * Set complete user data (e.g., after login)
-   */
+  /** Set user profile (from /api/me response) */
   setUser: (user: User | null) => void;
   
-  /**
-   * Partially update user data (e.g., profile edit)
-   */
+  /** Partial update (optimistic UI) */
   updateUser: (updates: Partial<User>) => void;
   
-  /**
-   * Clear user data (e.g., on logout)
-   */
+  /** Clear on logout */
   clearUser: () => void;
   
-  /**
-   * Check if user is authenticated
-   */
-  checkAuth: () => boolean;
-
-  /**
-   * Hydrate user from auth session (Better Auth, Supabase, etc.)
-   * Call this on app mount to restore session
-   */
-  hydrateFromSession: (sessionUser: User | null) => void;
-
-  /**
-   * Set loading state
-   */
+  /** Set loading state */
   setLoading: (isLoading: boolean) => void;
-
-  /**
-   * Mark store as hydrated (called by persist middleware)
-   */
+  
+  /** Mark as hydrated */
   setHydrated: () => void;
 }
 
-/**
- * Combined store type
- */
 type UserStore = UserState & UserActions;
 
 // ============================================================================
@@ -82,112 +62,51 @@ type UserStore = UserState & UserActions;
 // ============================================================================
 
 /**
- * User store with persist middleware
- * - Stores user state in sessionStorage for session persistence
- * - Uses 'user-storage' as the storage key
- * - Automatically rehydrates state on app load
+ * User Profile Store
  * 
- * Key behaviors:
- * - On app load, persist middleware reads from sessionStorage and hydrates the store
- * - onRehydrateStorage runs AFTER persist reads from storage
- * - isHydrated flag is set to true when rehydration completes
- * - SessionProvider waits for isHydrated=true before fetching session
+ * Architecture:
+ * - Auth session = identity only (id, email) - NOT stored here
+ * - This store = profile data from database (/api/me)
+ * - Hydrated via ProfileProvider, not auth session
+ * 
+ * Flow:
+ * 1. Auth session verifies identity (useAuthSession)
+ * 2. useProfile() fetches from /api/me
+ * 3. ProfileProvider hydrates this store
+ * 4. Components read from store for instant access
+ * 
+ * Benefits:
+ * - No stale profile data in session
+ * - Multi-device consistency (always fetches latest)
+ * - Clear separation of concerns
  */
 export const useUserStore = create<UserStore>()(
   persist(
-    (set, get) => ({
-      // ========================================================================
-      // Initial State
-      // ========================================================================
+    (set) => ({
+      // State
       user: null,
-      isAuthenticated: false,
       isHydrated: false,
       isLoading: false,
 
-      // ========================================================================
       // Actions
-      // ========================================================================
-
-      /**
-       * Set user data and mark as authenticated
-       * Use this after successful login/signup or session restore
-       */
-      setUser: (user) =>
-        set({
-          user,
-          isAuthenticated: !!user,
-          isLoading: false,
-        }),
-
-      /**
-       * Partially update user data while preserving existing fields
-       * Use this for profile updates, avatar changes, etc.
-       */
+      setUser: (user) => set({ user, isLoading: false }),
+      
       updateUser: (updates) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...updates } : null,
         })),
-
-      /**
-       * Clear user data and mark as unauthenticated
-       * Use this on logout
-       */
-      clearUser: () =>
-        set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-        }),
-
-      /**
-       * Check authentication status
-       * Returns true if user exists and is authenticated
-       */
-      checkAuth: () => {
-        const state = get();
-        return state.isAuthenticated && state.user !== null;
-      },
-
-      /**
-       * Hydrate user from auth session
-       * Call this on app mount to sync with auth provider
-       */
-      hydrateFromSession: (sessionUser) => {
-        set({
-          user: sessionUser,
-          isAuthenticated: !!sessionUser,
-          isHydrated: true,
-          isLoading: false,
-        });
-      },
-
-      /**
-       * Set loading state
-       */
-      setLoading: (isLoading) =>
-        set({
-          isLoading,
-        }),
-
-      /**
-       * Mark store as hydrated
-       */
-      setHydrated: () =>
-        set({
-          isHydrated: true,
-        }),
+      
+      clearUser: () => set({ user: null, isLoading: false }),
+      
+      setLoading: (isLoading) => set({ isLoading }),
+      
+      setHydrated: () => set({ isHydrated: true }),
     }),
     {
-      name: 'user-storage', // sessionStorage key
-      storage: createJSONStorage(() => sessionStorage), // Use sessionStorage for better security
-      partialize: (state) => ({
-        // Only persist user data, not loading/hydration flags
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
-      onRehydrateStorage: () => (state, action) => {
-        // Mark as hydrated after rehydration completes
-        // This is called AFTER persist middleware reads from sessionStorage
+      name: 'user-profile-storage',
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({ user: state.user }),
+      onRehydrateStorage: () => (state) => {
         if (state) {
           state.isHydrated = true;
         }
@@ -197,53 +116,32 @@ export const useUserStore = create<UserStore>()(
 );
 
 // ============================================================================
-// Selectors (for performance optimization)
+// Selectors
 // ============================================================================
 
-/**
- * Selector hooks to prevent unnecessary re-renders
- * Use these in components instead of accessing the full store
- */
-
-/**
- * Get user object (subscribes only to user changes)
- */
+/** Get user profile */
 export const useUser = () => useUserStore((state) => state.user);
 
-/**
- * Get authentication status (subscribes only to isAuthenticated)
- */
-export const useIsAuthenticated = () => useUserStore((state) => state.isAuthenticated);
+/** Check if authenticated (has profile) */
+export const useIsAuthenticated = () => useUserStore((state) => !!state.user);
 
-/**
- * Get hydration status (to prevent hydration mismatches)
- */
+/** Check if store is hydrated */
 export const useIsHydrated = () => useUserStore((state) => state.isHydrated);
 
-/**
- * Get loading status
- */
+/** Check if loading */
 export const useIsLoading = () => useUserStore((state) => state.isLoading);
 
-/**
- * Get specific user field (e.g., just email or name)
- * Most performant - only re-renders when that specific field changes
- */
+/** Get specific user field */
 export const useUserField = <K extends keyof User>(field: K) =>
   useUserStore((state) => state.user?.[field]);
 
-/**
- * Get only the actions (never causes re-renders)
- * Uses shallow comparison to ensure stable reference
- */
+/** Get actions only (never re-renders) */
 export const useUserActions = () =>
   useUserStore(
     useShallow((state) => ({
       setUser: state.setUser,
       updateUser: state.updateUser,
       clearUser: state.clearUser,
-      checkAuth: state.checkAuth,
-      hydrateFromSession: state.hydrateFromSession,
       setLoading: state.setLoading,
     }))
   );

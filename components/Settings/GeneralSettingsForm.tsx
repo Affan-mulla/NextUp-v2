@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { UploadCloud, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser, useUserActions } from "@/lib/store/user-store";
+import { useInvalidateProfile } from "@/lib/hooks/useProfile";
 import { generalSettingsSchema, type GeneralSettingsInput } from "@/lib/validation/settings-general-schema";
 import { updateGeneralInfo } from "@/lib/actions/update-general-info";
 import { uploadAvatar, validateAvatarFile } from "@/lib/utils/upload-avatar";
@@ -34,6 +35,7 @@ import { Separator } from "@/components/ui/separator";
 export default function GeneralSettingsForm() {
   const user = useUser();
   const { updateUser } = useUserActions();
+  const invalidateProfile = useInvalidateProfile();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -143,13 +145,16 @@ export default function GeneralSettingsForm() {
         return;
       }
 
-      // Update local user store with changed fields only
+      // Optimistic UI update (instant feedback)
       const userUpdates: Partial<typeof user> = {};
       if (changedData.name !== undefined) userUpdates.name = changedData.name;
       if (changedData.username !== undefined) userUpdates.username = changedData.username;
       if (changedData.avatar !== undefined) userUpdates.avatar = changedData.avatar || undefined;
       
       updateUser(userUpdates);
+
+      // Invalidate profile cache to refetch from DB (source of truth)
+      invalidateProfile();
 
       toast.success(result.message);
       reset(data); // Reset form to new values (clears isDirty state)
@@ -353,6 +358,7 @@ export default function GeneralSettingsForm() {
           Cancel
         </Button>
         <Button
+          variant="default"
           type="submit"
           disabled={!isDirty || isSubmitting}
           className="w-full sm:w-auto min-w-[100px]"

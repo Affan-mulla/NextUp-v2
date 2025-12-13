@@ -3,7 +3,6 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "../prisma";
 import { sendVerificationEmail } from "../email";
 import { createVerificationToken } from "../utils/verification";
-import { customSession } from "better-auth/plugins/custom-session";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -67,20 +66,4 @@ export const auth = betterAuth({
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
     },
-    plugins:[
-        customSession(async ({ user, session }) => {
-            const userData = await prisma.user.findUnique({ 
-                where: { id: session.userId }, 
-                select: { username: true, name: true } 
-            });
-            return {
-                user: {
-                    ...user,
-                    username: userData?.username,
-                    displayName: userData?.name
-                },
-                session
-            };
-        }),
-    ]
 });

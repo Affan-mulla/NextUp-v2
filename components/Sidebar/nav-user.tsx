@@ -20,6 +20,8 @@
     useIsHydrated,
     useIsLoading,
   } from "@/lib/store/user-store";
+  import { useInvalidateAuthSession } from "@/lib/hooks/useAuthSession";
+  import { useInvalidateProfile } from "@/lib/hooks/useProfile";
   import { Skeleton } from "@/components/ui/skeleton";
   import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
   import Togglemode from "../Theme/Toggle-mode";
@@ -48,6 +50,8 @@ import { Button } from "../ui/button";
     const { clearUser } = useUserActions();
     const isHydrated = useIsHydrated();
     const isLoading = useIsLoading();
+    const invalidateAuthSession = useInvalidateAuthSession();
+    const invalidateProfile = useInvalidateProfile();
 
     // Show loading skeleton while hydrating
     if (!isHydrated || isLoading) {
@@ -95,7 +99,10 @@ import { Button } from "../ui/button";
             `Logout failed: ${(res as any).error.message || "Unknown error"}`
           );
         } else {
+          // Clear all caches and store
           clearUser();
+          invalidateAuthSession();
+          invalidateProfile();
           toast.success("Logged out");
           router.push("/auth/sign-in");
         }
