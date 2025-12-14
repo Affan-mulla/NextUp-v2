@@ -80,7 +80,7 @@ import { Button } from "../ui/button";
       {
         label: "Subscription",
         value: "PRO",
-        href: "#",
+        href: "/subscription",
         icon: <HugeiconsIcon icon={CreditCardIcon} className="size-[18px]" />
       },
       {
