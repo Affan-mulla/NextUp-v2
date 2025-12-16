@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import AccountClient, { type AccountSettingsProps } from "./AccountClient";
 
+
+
 export default async function Account() {
   const hdrs = await headers();
   const session = await auth.api.getSession({ headers: hdrs as any });

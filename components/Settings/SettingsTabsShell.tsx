@@ -2,7 +2,8 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import SettingsSkeleton from "./SettingsSkeleton";
 
 interface TabItem {
   value: string;
@@ -15,14 +16,14 @@ export default function SettingsTabsShell({ tabs }: { tabs: TabItem[] }) {
 
   return (
     <Tabs value={active} onValueChange={setActive} className="w-full">
-      <TabsList className="relative w-full flex justify-start gap-6 bg-transparent p-0 border-b border-border">
+      <TabsList className="relative w-full flex justify-start gap-6 bg-transparent rounded-none p-0 border-b border-border">
         {tabs.map((tab) => {
           const selected = active === tab.value;
           return (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="relative py-2 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:border-0 shadow-none"
+              className="relative py-2 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-muted data-[state=active]:border-0 shadow-none rounded-b-none"
             >
               {tab.label}
               {selected && (
@@ -39,7 +40,9 @@ export default function SettingsTabsShell({ tabs }: { tabs: TabItem[] }) {
 
       {tabs.map((tab) => (
         <TabsContent key={tab.value} value={tab.value}>
-          {tab.node}
+          <Suspense fallback={<SettingsSkeleton />}>
+           {tabs.find(t => t.value === active)?.node}
+          </Suspense>
         </TabsContent>
       ))}
     </Tabs>
