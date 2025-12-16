@@ -46,7 +46,6 @@ import { Button } from "../ui/button";
 
     // Get user from Zustand store
     const user = useUser();
-    console.log("NavUser render - user :", user?.avatar);
     const { clearUser } = useUserActions();
     const isHydrated = useIsHydrated();
     const isLoading = useIsLoading();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -53,12 +53,27 @@ export default function GeneralSettingsForm() {
     defaultValues: {
       name: user?.name || "",
       username: user?.username || "",
-      bio: "",
+      bio: user?.bio || "",
       avatar: user?.avatar || "",
     },
   });
 
   const currentAvatar = watch("avatar");
+
+  /**
+   * Reset form when user data loads
+   * Fixes issue where form fields are empty on first render after page refresh
+   */
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name || "",
+        username: user.username || "",
+        bio: user.bio || "",
+        avatar: user.avatar || "",
+      });
+    }
+  }, [user, reset]);
 
   /**
    * Handle avatar file upload
@@ -208,7 +223,7 @@ export default function GeneralSettingsForm() {
           </Label>
           <Input
             id="name"
-            placeholder="Olivia Rhye"
+            placeholder="Anon User"
             {...register("name")}
             className={cn(errors.name && "border-destructive focus-visible:ring-destructive")}
           />
@@ -224,7 +239,7 @@ export default function GeneralSettingsForm() {
           </Label>
           <Input
             id="username"
-            placeholder="olivia_rhye"
+            placeholder="anon123"
             {...register("username")}
             className={cn(errors.username && "border-destructive focus-visible:ring-destructive")}
           />
@@ -251,7 +266,7 @@ export default function GeneralSettingsForm() {
           className="bg-muted/50 cursor-not-allowed"
         />
         <p className="text-xs text-muted-foreground">
-          Contact support to change your email address.
+          Email can be changed in your account settings.
         </p>
       </div>
 
