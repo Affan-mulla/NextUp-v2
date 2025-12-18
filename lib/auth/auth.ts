@@ -61,6 +61,13 @@ export const auth = betterAuth({
             clientSecret: process.env.GITHUB_SECRET!,
         }
     },
+
+    account : {
+
+        accountLinking : {
+            enabled: true,
+        }
+    },
     session: {
         expiresIn: 60 * 60 * 24 * 30, // 30 days
         sameSite: "lax",

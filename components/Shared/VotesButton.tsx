@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useIsVotingIdea, useVoteIdea, VoteType } from "@/hooks/useVoting";
 import { UserVoteType } from "@/types/VoteType";
+import { useEffect } from "react";
 
 const VotesButton = ({
   id,
@@ -12,8 +13,7 @@ const VotesButton = ({
 }: {
   id: string;
   votesCount: number;
-  userVoteTypeProps?: UserVoteType
-    ;
+  userVoteTypeProps?: UserVoteType;
 }) => {
   /**
    * Get vote mutation from React Query
@@ -29,12 +29,22 @@ const VotesButton = ({
   const isVoting = useIsVotingIdea(id);
 
   /**
+   * Normalize userVote to handle both object and string formats
+   * Ensures we always work with simple "UP" | "DOWN" | null
+   */
+
+  const normalizedUserVote: VoteType | null = 
+    typeof userVoteTypeProps === 'object' && userVoteTypeProps !== null && 'type' in userVoteTypeProps
+      ? (userVoteTypeProps as any).type
+      : (userVoteTypeProps as VoteType | null | undefined) ?? null;
+
+  /**
    * Determine vote states
    * isUpvoted: true if user has upvoted this idea
    * isDownvoted: true if user has downvoted this idea
    */
-  const isUpvoted = userVoteTypeProps === "UP"
-  const isDownvoted = userVoteTypeProps === "DOWN";
+  const isUpvoted = normalizedUserVote === "UP";
+  const isDownvoted = normalizedUserVote === "DOWN";
 
   /**
    * Handle vote button click
@@ -67,14 +77,17 @@ const VotesButton = ({
         }}
         disabled={isVoting}
         className={cn(
-          "hover:text-green-500 text-muted-foreground  hover:backdrop-blur-2xl z-20 transition-colors",
+          "hover:text-green-500 text-muted-foreground hover:backdrop-blur-2xl z-20 transition-colors",
           isVoting && "opacity-50 cursor-not-allowed",
           isUpvoted && "text-green-500"
         )}
       >
         <ArrowBigUpDash
           size={10}
-          className={cn("transition-all", isUpvoted && "fill-current", isUpvoted && "text-green-500")}
+          className={cn(
+            "transition-all",
+            isUpvoted && "fill-current text-green-500"
+          )}
         />
       </Button>
 
@@ -94,13 +107,16 @@ const VotesButton = ({
         disabled={isVoting}
         className={cn(
           "hover:text-red-500 text-muted-foreground transition-colors",
-          isDownvoted && "text-red-500",
-          isVoting && "opacity-50 cursor-not-allowed"
+          isVoting && "opacity-50 cursor-not-allowed",
+          isDownvoted && "text-red-500"
         )}
       >
         <ArrowBigDownDash
           size={10}
-          className={cn("transition-all", isDownvoted && "fill-current")}
+          className={cn(
+            "transition-all",
+            isDownvoted && "fill-current text-red-500"
+          )}
         />
       </Button>
     </div>

@@ -17,6 +17,7 @@ export const getUserProfile = cache(
         username: true,
         name: true,
         image: true,
+        bio: true,
         createdAt: true,
         _count: {
           select: {
@@ -64,7 +65,8 @@ export async function getUserPosts(
   username: string,
   cursor?: string,
   limit = 10,
-  sortBy: "latest" | "top" = "latest"
+  sortBy: "latest" | "top" = "latest",
+  currentUserId?: string
 ): Promise<{ posts: ProfilePost[]; nextCursor: string | null }> {
   const user = await prisma.user.findUnique({
     where: { username },
@@ -94,11 +96,16 @@ export async function getUserPosts(
       title: true,
       description: true,
       votesCount: true,
-      votes: {
-        select: {
-          type: true,
-        },
-      },
+      votes: currentUserId
+        ? {
+            where: {
+              userId: currentUserId,
+            },
+            select: {
+              type: true,
+            },
+          }
+        : false,
       createdAt: true,
       uploadedImages: true,
       author: {
@@ -128,7 +135,7 @@ export async function getUserPosts(
   return {
     posts: results.map((post) => ({
       ...post,
-      votes: post.votes[0] ? post.votes[0].type : undefined,
+      votes: Array.isArray(post.votes) && post.votes[0] ? post.votes[0].type : undefined,
     })),
     nextCursor: hasNextPage ? results[results.length - 1].id : null,
   };
@@ -138,7 +145,8 @@ export async function getUserComments(
   username: string,
   cursor?: string,
   limit = 10,
-  sortBy: "latest" | "top" = "latest"
+  sortBy: "latest" | "top" = "latest",
+  currentUserId?: string
 ): Promise<{ comments: ProfileComment[]; nextCursor: string | null }> {
   const user = await prisma.user.findUnique({
     where: { username },
@@ -193,11 +201,16 @@ export async function getUserComments(
         }
       },
       commentId: true,
-      votes: {
-        select: {
-          type: true,
-        },
-      },
+      votes: currentUserId
+        ? {
+            where: {
+              userId: currentUserId,
+            },
+            select: {
+              type: true,
+            },
+          }
+        : false,
       post: {
         select: {
           id: true,
@@ -213,9 +226,10 @@ export async function getUserComments(
   const results = hasNextPage ? comments.slice(0, -1) : comments;
 
   return {
-    comments: results.map((com) => {
-      return { ...com, votes: com.votes[0] ? com.votes[0].type : undefined };
-    }),
+    comments: results.map((com) => ({
+      ...com,
+      votes: Array.isArray(com.votes) && com.votes[0] ? com.votes[0].type : undefined,
+    })),
     nextCursor: hasNextPage ? results[results.length - 1].id : null,
   };
 }

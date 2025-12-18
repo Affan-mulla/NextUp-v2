@@ -2,71 +2,96 @@
 
 import { useEffect, useRef } from "react";
 import { useUserActions, useIsHydrated } from "@/lib/store/user-store";
-import { useSessionQuery } from "@/lib/hooks/useSession";
+import { useProfile } from "@/lib/hooks/useProfile";
+import { useAuthSession } from "@/lib/hooks/useAuthSession";
 
 /**
- * SessionProvider - Automatically hydrates user state on app mount
+ * ProfileProvider - Hydrates user profile from database
  * 
- * Optimizations:
- * - Single session fetch (no retry loop)
- * - Memoized callback to prevent recreating function
- * - Proper cleanup on unmount
- * - Minimal re-renders (only on isHydrated change)
- * - Production logging (errors only, optional debug mode)
- * - Centralized session mapping via session-utils
+ * Architecture:
+ * - Auth session = identity only (id, email)
+ * - Profile = full user data from /api/me
+ * - Store = client cache for instant access
  * 
  * Flow:
- * 1. Store rehydrates from sessionStorage (persist middleware)
- * 2. useIsHydrated() returns true
- * 3. SessionProvider fetches session from API
- * 4. If session exists, hydrateFromSession() updates the store
- * 5. If no session, the stored session is cleared
+ * 1. Check auth session (identity)
+ * 2. If authenticated, fetch profile from /api/me
+ * 3. Hydrate Zustand store with profile data
+ * 4. Components read from store
  * 
- * Usage: Wrap your app layout ONCE with this provider (only in root layout)
+ * Benefits:
+ * - No stale data in session tokens
+ * - Multi-device consistency
+ * - Clear separation: auth vs profile
  */
 export function SessionProvider({ 
   children,
-  debug = true, // Enable detailed logging in development
+  debug = false,
 }: { 
   children: React.ReactNode;
   debug?: boolean;
 }) {
-  const { hydrateFromSession, setLoading } = useUserActions();
+  const { setUser, clearUser, setLoading } = useUserActions();
   const isHydrated = useIsHydrated();
-  const isInitialized = useRef(false);
   const debugRef = useRef(debug);
+  const previousAuthState = useRef<boolean | null>(null);
 
-  // Use React Query to fetch/cached the session. React Query controls when
-  // the session is refetched (staleTime, window focus, etc.). We only
-  // hydrate the Zustand store when the query returns.
-  const { data: sessionUser, isLoading: queryLoading } = useSessionQuery({
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    onSuccess: (user) => {
-      if (debugRef.current) {
-      }
-      hydrateFromSession(user)
-      setLoading(false)
-      if (debugRef.current && user) console.log("✅ Session hydrated:", user.email)
-      if (debugRef.current && !user) console.log("⚠️ No active session found")
+  // Step 1: Check auth session (identity only)
+  const { 
+    data: authSession, 
+    isLoading: authLoading 
+  } = useAuthSession();
+  
+  const isAuthenticated = !!authSession;
+
+  // Step 2: Fetch profile from database (only if authenticated)
+  const { 
+    data: profile, 
+    isLoading: profileLoading,
+    error: profileError,
+  } = useProfile({
+    enabled: isAuthenticated && isHydrated,
+  });
+
+  // Step 3: Hydrate store when profile is loaded
+  useEffect(() => {
+    if (!isHydrated) return;
+    
+    // Set loading while fetching
+    if (authLoading || profileLoading) {
+      setLoading(true);
+      return;
     }
-  })
-// Wait for store hydration first
-useEffect(() => {
-  if (!isHydrated) return
-  if (debugRef.current) console.log("✅ Store hydrated, now waiting for session fetch...")
-  setLoading(true)
-}, [isHydrated])
 
-// Handle session query changes
-useEffect(() => {
-  if (!isHydrated) return
-  if (queryLoading) return
-  if (sessionUser !== undefined) {
-    hydrateFromSession(sessionUser ?? null)
-    setLoading(false)
-    isInitialized.current = true
-  }
-}, [isHydrated, queryLoading, sessionUser])
+    // Handle logout: auth session gone
+    if (!isAuthenticated && previousAuthState.current === true) {
+      if (debugRef.current) console.log("[Profile] User logged out, clearing store");
+      clearUser();
+      previousAuthState.current = false;
+      return;
+    }
+
+    // Handle login/profile loaded
+    if (isAuthenticated && profile) {
+      if (debugRef.current) console.log("[Profile] Hydrating store:", profile);
+      setUser(profile);
+      previousAuthState.current = true;
+      return;
+    }
+
+    // Handle no auth
+    if (!isAuthenticated) {
+      setLoading(false);
+      previousAuthState.current = false;
+    }
+  }, [isHydrated, authLoading, profileLoading, isAuthenticated, profile, setUser, clearUser, setLoading]);
+
+  // Log errors in debug mode
+  useEffect(() => {
+    if (debugRef.current && profileError) {
+      console.error("[Profile] Error fetching profile:", profileError);
+    }
+  }, [profileError]);
 
   return <>{children}</>;
 }

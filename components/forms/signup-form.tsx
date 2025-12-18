@@ -20,8 +20,8 @@ import Link from "next/link";
 import GithubBtn from "./GithubBtn";
 import AuthCard from "./AuthCard";
 import { Spinner } from "../ui/spinner";
-import { useUserActions } from "@/lib/store/user-store";
-import { useInvalidateSession } from "@/lib/hooks/useSession";
+import { useInvalidateProfile } from "@/lib/hooks/useProfile";
+import { useInvalidateAuthSession } from "@/lib/hooks/useAuthSession";
 
 export function SignupForm({
   className,
@@ -35,8 +35,8 @@ export function SignupForm({
   } = useForm<SignUpType>({
     resolver: zodResolver(signUpSchema),
   });
-  const { hydrateFromSession } = useUserActions();
-  const invalidateSession = useInvalidateSession();
+  const invalidateProfile = useInvalidateProfile();
+  const invalidateAuthSession = useInvalidateAuthSession();
 
   const onSubmit = async (data: SignUpType) => {
 

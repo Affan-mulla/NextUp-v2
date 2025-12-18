@@ -28,8 +28,8 @@ import Link from "next/link";
 import GithubBtn from "./GithubBtn";
 import AuthCard from "./AuthCard";
 import { Spinner } from "../ui/spinner";
-import { useUserActions } from "@/lib/store/user-store";
-import { useInvalidateSession } from "@/lib/hooks/useSession";
+import { useInvalidateProfile } from "@/lib/hooks/useProfile";
+import { useInvalidateAuthSession } from "@/lib/hooks/useAuthSession";
 
 export function LoginForm({
   className,
@@ -43,8 +43,8 @@ export function LoginForm({
   } = useForm<SignInType>({
     resolver: zodResolver(signInSchema),
   });
-  const { hydrateFromSession } = useUserActions();
-  const invalidateSession = useInvalidateSession();
+  const invalidateProfile = useInvalidateProfile();
+  const invalidateAuthSession = useInvalidateAuthSession();
 
   const onSubmit = async (data: SignInType) => {
     await authClient.signIn.email(
@@ -59,15 +59,9 @@ export function LoginForm({
          
         },
         onSuccess: async () => {
-          // Dynamically import to avoid bundling in initial load
-          const { fetchSessionUser } = await import("@/lib/auth/session-utils");
-          const user = await fetchSessionUser();
-          
-          if (user) {
-            hydrateFromSession(user);
-            // Invalidate the session query cache so SessionProvider fetches latest
-            await invalidateSession();
-          }
+          // Invalidate auth session and profile to refetch from DB
+          invalidateAuthSession();
+          invalidateProfile();
           
           reset();
           toast.success("Sign-in successful!");

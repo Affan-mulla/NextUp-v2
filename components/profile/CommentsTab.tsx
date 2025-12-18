@@ -23,6 +23,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Message01Icon,  } from "@hugeicons/core-free-icons";
 import { useRouter } from "next/navigation";
 import CommentAction from "../comment/CommentAction";
+import { useUserField } from "@/lib/store/user-store";
 
 interface CommentsResponse {
   comments: ProfileComment[];
@@ -85,11 +86,10 @@ export default function CommentsTab({ username }: { username: string }) {
 
   const comments = data?.pages.flatMap((page) => page.comments) ?? [];
 
-  console.log({comments : comments});
   
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end mr-4 sm:mr-0">
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
@@ -143,6 +143,9 @@ function CommentItem({
   comment: ProfileComment;
   router: any;
 }) {
+  const currentUserId = useUserField("id");
+  const isOwner = currentUserId === comment.user.id;
+  
   const linked = comment.idea || comment.post;
   const href = comment.idea
     ? `/idea/${comment.idea.id}`
@@ -226,14 +229,15 @@ function CommentItem({
           <span className="text-xs">Reply</span>
         </Button>
 
-        <CommentAction
-          commentId={comment.id}
-          ideaId={comment.idea?.id || comment.post?.id || ""}
-          onEditClick={() => {
-            router.push(`${href}#edit-comment-${comment.id}`);
-          }}
-        
-        />
+        {isOwner && (
+          <CommentAction
+            commentId={comment.id}
+            ideaId={comment.idea?.id || comment.post?.id || ""}
+            onEditClick={() => {
+              router.push(`${href}#edit-comment-${comment.id}`);
+            }}
+          />
+        )}
       </div>
     </div>
   );

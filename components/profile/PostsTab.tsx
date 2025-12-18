@@ -10,17 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageSquare, Loader2, ArrowBigUpDash } from "lucide-react";
-import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { PostSkeleton } from "./PostSkeleton";
-import UserDetail from "@/app/(user)/idea/[id]/UserDetail";
 import axios from "axios";
 import { ProfilePost } from "@/types/profile";
-import VotesButton from "../Shared/VotesButton";
 import { useRouter } from "next/navigation";
-import CommentBox from "../Shared/CommentBox";
-import SaveIdea from "../Shared/SaveIdea";
 import IdeaCard from "../feed/IdeaCard";
 import { IdeaCardSkeleton } from "../feed/IdeaCardSkeleton";
 
@@ -86,13 +80,9 @@ export default function PostsTab({ username }: { username: string }) {
 
   const posts = data?.pages.flatMap((page) => page.posts) ?? [];
 
-  console.log({
-    postsonprofile: posts,
-  });
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end mr-4 sm:mr-0">
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
