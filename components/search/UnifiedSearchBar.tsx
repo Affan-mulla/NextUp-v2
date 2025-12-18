@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { motion, AnimatePresence } from "motion/react"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { debounce } from "@/utils/debounce"
-import { cn } from "@/lib/utils"
-import axios from "axios"
-import Link from "next/link"
+import * as React from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { debounce } from "@/utils/debounce";
+import { cn } from "@/lib/utils";
+import axios from "axios";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 
 interface SearchUser {
-  id: string
-  username: string
-  email: string
-  avatar: string | null
+  id: string;
+  username: string;
+  email: string;
+  avatar: string | null;
 }
 
 interface SearchProduct {
-  id: string
-  title: string
-  image: string | null
-  price: number | null
+  id: string;
+  title: string;
+  image: string | null;
+  price: number | null;
 }
 
 interface SearchResponse {
-  users: SearchUser[]
-  products: SearchProduct[]
+  users: SearchUser[];
+  products: SearchProduct[];
 }
 
-type Group = "user" | "product"
+type Group = "user" | "product";
 
 interface HighlightProps {
-  text: string
-  query: string
+  text: string;
+  query: string;
 }
 
 const Highlight: React.FC<HighlightProps> = ({ text, query }) => {
-  if (!query) return <>{text}</>
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig")
-  const parts = text.split(regex)
+  if (!query) return <>{text}</>;
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "ig"
+  );
+  const parts = text.split(regex);
 
   return (
     <>
@@ -53,57 +59,64 @@ const Highlight: React.FC<HighlightProps> = ({ text, query }) => {
         )
       )}
     </>
-  )
-}
+  );
+};
 
-const SKELETON_ITEMS = 3
+const SKELETON_ITEMS = 3;
 
 export const UnifiedSearchBar: React.FC = () => {
-  const [query, setQuery] = React.useState("")
-  const [results, setResults] = React.useState<SearchResponse>({ users: [], products: [] })
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
-  const [activeGroup, setActiveGroup] = React.useState<Group | null>(null)
-  const [activeIndex, setActiveIndex] = React.useState<number>(-1)
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState<SearchResponse>({
+    users: [],
+    products: [],
+  });
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [activeGroup, setActiveGroup] = React.useState<Group | null>(null);
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1);
+  const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
-  const containerRef = React.useRef<HTMLDivElement | null>(null)
-  const inputRef = React.useRef<HTMLInputElement | null>(null)
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const totalItems = (results.users?.length ?? 0) + (results.products?.length ?? 0)
+  const totalItems =
+    (results.users?.length ?? 0) + (results.products?.length ?? 0);
 
   const runSearch = React.useMemo(
     () =>
       debounce(async (value: string) => {
         if (!value) {
-          setResults({ users: [], products: [] })
-          setLoading(false)
-          return
+          setResults({ users: [], products: [] });
+          setLoading(false);
+          return;
         }
 
         try {
-          const res = await axios.get(`/api/search?q=${encodeURIComponent(value)}`)
-          const json = res.data as SearchResponse
-          setResults(json)
+          const res = await axios.get(
+            `/api/search?q=${encodeURIComponent(value)}`
+          );
+          const json = res.data as SearchResponse;
+          setResults(json);
         } catch (error) {
-          console.error(error)
-          setResults({ users: [], products: [] })
+          console.error(error);
+          setResults({ users: [], products: [] });
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }, 300),
     []
-  )
+  );
 
   React.useEffect(() => {
     if (!query.trim()) {
-      setResults({ users: [], products: [] })
-      setActiveIndex(-1)
-      setActiveGroup(null)
-      return
+      setResults({ users: [], products: [] });
+      setActiveIndex(-1);
+      setActiveGroup(null);
+      return;
     }
-    setLoading(true)
-    runSearch(query.trim())
-  }, [query, runSearch])
+    setLoading(true);
+    runSearch(query.trim());
+  }, [query, runSearch]);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -111,82 +124,115 @@ export const UnifiedSearchBar: React.FC = () => {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
-        setActiveIndex(-1)
-        setActiveGroup(null)
+        setIsOpen(false);
+        setActiveIndex(-1);
+        setActiveGroup(null);
+        setIsMobileOpen(false);
       }
-    }
+    };
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsOpen(false)
-        setActiveIndex(-1)
-        setActiveGroup(null)
+        setIsOpen(false);
+        setActiveIndex(-1);
+        setActiveGroup(null);
+        setIsMobileOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
-    document.addEventListener("keydown", handleEsc)
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-      document.removeEventListener("keydown", handleEsc)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen && ["ArrowDown", "ArrowUp"].includes(event.key)) {
-      setIsOpen(true)
+      setIsOpen(true);
     }
 
-    if (!totalItems) return
+    if (!totalItems) return;
 
     if (event.key === "ArrowDown") {
-      event.preventDefault()
-      const nextIndex = (activeIndex + 1 + totalItems) % totalItems
-      setActiveIndex(nextIndex)
-      setActiveGroup(nextIndex < results.users.length ? "user" : "product")
+      event.preventDefault();
+      const nextIndex = (activeIndex + 1 + totalItems) % totalItems;
+      setActiveIndex(nextIndex);
+      setActiveGroup(nextIndex < results.users.length ? "user" : "product");
     }
 
     if (event.key === "ArrowUp") {
-      event.preventDefault()
-      const nextIndex = (activeIndex - 1 + totalItems) % totalItems
-      setActiveIndex(nextIndex)
-      setActiveGroup(nextIndex < results.users.length ? "user" : "product")
+      event.preventDefault();
+      const nextIndex = (activeIndex - 1 + totalItems) % totalItems;
+      setActiveIndex(nextIndex);
+      setActiveGroup(nextIndex < results.users.length ? "user" : "product");
     }
 
     if (event.key === "Enter" && activeIndex >= 0) {
-      event.preventDefault()
+      event.preventDefault();
       const item =
         activeIndex < results.users.length
           ? { type: "user" as const, value: results.users[activeIndex] }
-          : { type: "product" as const, value: results.products[activeIndex - results.users.length] }
+          : {
+              type: "product" as const,
+              value: results.products[activeIndex - results.users.length],
+            };
 
       // TODO: wire navigation to item detail page
-      console.log("Selected", item)
-      setIsOpen(false)
+      console.log("Selected", item);
+      setIsOpen(false);
     }
 
     if (event.key === "Escape") {
-      setIsOpen(false)
+      setIsOpen(false);
     }
-  }
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setQuery(value)
-    setIsOpen(!!value)
-  }
+    const value = event.target.value;
+    setQuery(value);
+    setIsOpen(!!value);
+  };
 
   const hasResults =
     (results.users && results.users.length > 0) ||
-    (results.products && results.products.length > 0)
+    (results.products && results.products.length > 0);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full max-w-md "
-    >
+    <div ref={containerRef} className="relative w-full max-w-md flex justify-end ">
+      {/* Mobile search trigger */}
+
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+            onClick={() => {
+              setIsMobileOpen(false);
+              setIsOpen(false);
+              setQuery("");
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <Button
+        variant={"secondary"}
+        onClick={() => {
+          setIsMobileOpen(true);
+          setIsOpen(true);
+          setTimeout(() => inputRef.current?.focus(), 50);
+        }}
+        size={"icon-sm"}
+        className="md:hidden"
+      >
+        <HugeiconsIcon icon={Search01Icon} />
+      </Button>
 
       <Input
         ref={inputRef}
@@ -195,7 +241,11 @@ export const UnifiedSearchBar: React.FC = () => {
         onChange={handleChange}
         onFocus={() => query && setIsOpen(true)}
         onKeyDown={handleKeyDown}
-        className="bg-popover text-xs text-foreground h-9 rounded-lg border dark:border-border shadow-[0_2px_2px_-2px_rgba(0,0,0,0.2)] border-accent-foreground/15 focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0"
+        className={cn(
+          "bg-popover text-xs text-foreground h-9 rounded-lg border dark:border-border shadow-[0_2px_2px_-2px_rgba(0,0,0,0.2)] border-accent-foreground/15 focus:ring-0 focus:ring-offset-0  transition-colors w-full focus-visible:ring-0 hidden md:block ",
+          isMobileOpen &&
+            "block md:hidden fixed top-8 w-100 left-4 right-4 z-60 bg-black  shadow-lg"
+        )}
       />
 
       <AnimatePresence>
@@ -205,7 +255,10 @@ export const UnifiedSearchBar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="absolute left-0 right-0 z-30 mt-2 rounded-lg border border-accent bg-linear-to-b from-white/5 to-transparent backdrop-blur-xl shadow"
+            className={cn(
+              "absolute left-0 right-0 z-30 mt-2 rounded-lg border border-accent bg-linear-to-b from-bg/95 via-bg/90 to-bg/80 backdrop-blur-lg shadow",
+              isMobileOpen && "fixed top-16 left-4 right-4 z-60"
+            )}
           >
             <ScrollArea className="max-h-80 rounded-lg">
               <div className="p-2 text-sm">
@@ -235,11 +288,13 @@ export const UnifiedSearchBar: React.FC = () => {
                         </div>
                         <div className="space-y-1">
                           {results.users.map((user, index) => {
-                            const globalIndex = index
+                            const globalIndex = index;
                             const isActive =
-                              activeGroup === "user" && activeIndex === globalIndex
+                              activeGroup === "user" &&
+                              activeIndex === globalIndex;
                             return (
-                              <Link href={`/u/${user.username}`}
+                              <Link
+                                href={`/u/${user.username}`}
                                 key={user.id}
                                 type="button"
                                 className={cn(
@@ -249,13 +304,16 @@ export const UnifiedSearchBar: React.FC = () => {
                                     : "hover:bg-muted/60"
                                 )}
                                 onMouseEnter={() => {
-                                  setActiveIndex(globalIndex)
-                                  setActiveGroup("user")
+                                  setActiveIndex(globalIndex);
+                                  setActiveGroup("user");
                                 }}
                               >
                                 <Avatar className="h-8 w-8">
                                   {user.avatar && (
-                                    <AvatarImage src={user.avatar} alt={user.username} />
+                                    <AvatarImage
+                                      src={user.avatar}
+                                      alt={user.username}
+                                    />
                                   )}
                                   <AvatarFallback>
                                     {user.username?.[0]?.toUpperCase() ?? "U"}
@@ -263,15 +321,21 @@ export const UnifiedSearchBar: React.FC = () => {
                                 </Avatar>
                                 <div className="flex flex-col">
                                   <span className="font-medium leading-tight">
-                                    <Highlight text={user.username} query={query} />
+                                    <Highlight
+                                      text={user.username}
+                                      query={query}
+                                    />
                                   </span>
                                   <span className="text-xs text-muted-foreground">
-                                    <Highlight text={user.email} query={query} />
+                                    <Highlight
+                                      text={user.email}
+                                      query={query}
+                                    />
                                   </span>
                                 </div>
                               </Link>
-                            )}
-                          )}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -283,9 +347,10 @@ export const UnifiedSearchBar: React.FC = () => {
                         </div>
                         <div className="space-y-1">
                           {results.products.map((product, index) => {
-                            const globalIndex = results.users.length + index
+                            const globalIndex = results.users.length + index;
                             const isActive =
-                              activeGroup === "product" && activeIndex === globalIndex
+                              activeGroup === "product" &&
+                              activeIndex === globalIndex;
                             return (
                               <button
                                 key={product.id}
@@ -297,8 +362,8 @@ export const UnifiedSearchBar: React.FC = () => {
                                     : "hover:bg-muted/60"
                                 )}
                                 onMouseEnter={() => {
-                                  setActiveIndex(globalIndex)
-                                  setActiveGroup("product")
+                                  setActiveIndex(globalIndex);
+                                  setActiveGroup("product");
                                 }}
                               >
                                 <div className="h-8 w-8 overflow-hidden rounded-md bg-muted">
@@ -312,7 +377,10 @@ export const UnifiedSearchBar: React.FC = () => {
                                 </div>
                                 <div className="flex flex-col">
                                   <span className="font-medium leading-tight">
-                                    <Highlight text={product.title} query={query} />
+                                    <Highlight
+                                      text={product.title}
+                                      query={query}
+                                    />
                                   </span>
                                   {product.price != null && (
                                     <span className="text-xs text-muted-foreground">
@@ -322,8 +390,8 @@ export const UnifiedSearchBar: React.FC = () => {
                                   )}
                                 </div>
                               </button>
-                            )}
-                          )}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -341,5 +409,5 @@ export const UnifiedSearchBar: React.FC = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};

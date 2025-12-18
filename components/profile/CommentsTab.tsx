@@ -85,11 +85,10 @@ export default function CommentsTab({ username }: { username: string }) {
 
   const comments = data?.pages.flatMap((page) => page.comments) ?? [];
 
-  console.log({comments : comments});
   
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end mr-4 sm:mr-0">
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />

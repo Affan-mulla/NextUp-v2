@@ -6,6 +6,7 @@ export interface ProfileUser {
   name: string;
   image: string | null;
   createdAt: Date;
+  bio: string | null;
   _count: {
     ideas: number;
     comments: number;

@@ -7,11 +7,8 @@ import {
 import { Button } from "../ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Delete01Icon,
   Delete02Icon,
-  MoreHorizontalIcon,
   MoreVerticalCircle01Icon,
-  PencilEdit01Icon,
   PencilEdit02Icon,
 } from "@hugeicons/core-free-icons";
 import {

@@ -17,6 +17,7 @@ export const getUserProfile = cache(
         username: true,
         name: true,
         image: true,
+        bio: true,
         createdAt: true,
         _count: {
           select: {
@@ -95,9 +96,12 @@ export async function getUserPosts(
       description: true,
       votesCount: true,
       votes: {
+        where:{
+          userId: user.id
+        },
         select: {
           type: true,
-        },
+        }
       },
       createdAt: true,
       uploadedImages: true,

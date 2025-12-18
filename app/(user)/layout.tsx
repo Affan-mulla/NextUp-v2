@@ -15,8 +15,6 @@ import { UnifiedSearchBar } from "@/components/search/UnifiedSearchBar";
 import { Button } from "@/components/ui/button";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -34,22 +32,16 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className="mr-4">
-            <Link
-              href="/idea"
-              className="
-           "
-            >
-              <Button
-                className=""
-                variant={"default" }
-              >
+            <Link href="/idea">
+              <Button className="" variant={"default"}>
                 {/* Icon */}
-                <HugeiconsIcon icon={AddCircleHalfDotIcon} className="size-5" strokeWidth={2} />
-
+                <HugeiconsIcon
+                  icon={AddCircleHalfDotIcon}
+                  className="size-5"
+                  strokeWidth={2}
+                />
                 {/* Text */}
-                <span className="font-medium">Create</span>
-
-                
+                <span className="font-medium sm:block hidden">Create</span>
               </Button>
             </Link>
           </div>
