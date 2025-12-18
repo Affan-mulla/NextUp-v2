@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserPosts } from "@/lib/utils/profile-queries";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +14,18 @@ export async function GET(
     const limit = parseInt(searchParams.get("limit") || "10");
     const sortBy = (searchParams.get("sortBy") || "latest") as "latest" | "top";
 
-    const { posts, nextCursor } = await getUserPosts(username, cursor, limit, sortBy);
+    // Get current user session (optional - works for anonymous users)
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs as any });
+    const currentUserId = session?.user?.id;
+
+    const { posts, nextCursor } = await getUserPosts(
+      username,
+      cursor,
+      limit,
+      sortBy,
+      currentUserId
+    );
 
     return NextResponse.json({
       posts,

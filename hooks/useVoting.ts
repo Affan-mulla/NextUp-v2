@@ -47,9 +47,7 @@ export interface VoteMutationData {
 export interface VoteResponse {
   success: boolean;
   votesCount: number;
-  userVote: {
-    type: VoteType;
-  } | null;
+  userVote: VoteType | null;
 }
 
 /**
@@ -58,9 +56,7 @@ export interface VoteResponse {
 export interface IdeaVoteData {
   id: string;
   votesCount: number;
-  userVote?: {
-    type: VoteType;
-  } | null;
+  userVote?:  VoteType | null ;
 }
 
 // ============================================================================
@@ -78,7 +74,7 @@ async function submitVote({
   ideaId,
   voteType,
 }: VoteMutationData): Promise<VoteResponse> {
-  const { data } = await axios.post<VoteResponse>(
+  const { data } = await axios.post(
     "/api/ideas/vote",
     { ideaId, voteType },
     {
@@ -88,7 +84,20 @@ async function submitVote({
     }
   );
 
-  return data;
+  // Normalize userVote to VoteType | null (handle both {type: "UP"} and "UP" formats)
+  let normalizedUserVote: VoteType | null = null;
+  if (data.userVote) {
+    // If userVote is an object with 'type' property, extract it
+    normalizedUserVote = typeof data.userVote === 'object' && 'type' in data.userVote 
+      ? data.userVote.type 
+      : data.userVote;
+  }
+
+  return {
+    success: data.success,
+    votesCount: data.votesCount,
+    userVote: normalizedUserVote,
+  };
 }
 
 // ============================================================================
@@ -106,10 +115,10 @@ async function submitVote({
  */
 function calculateVoteUpdate(
   currentVotesCount: number,
-  currentUserVote: { type: VoteType } | null | undefined,
+  currentUserVote: VoteType  | null | undefined,
   newVoteType: VoteType
-): { votesCount: number; userVote: { type: VoteType } | null } {
-  const currentVote = currentUserVote?.type;
+): { votesCount: number; userVote: VoteType | null } {
+  const currentVote = currentUserVote;
 
   // Case 1: Removing vote (clicked same button)
   if (currentVote === newVoteType) {
@@ -123,14 +132,14 @@ function calculateVoteUpdate(
   if (currentVote) {
     return {
       votesCount: currentVotesCount + (newVoteType === "UP" ? 2 : -2),
-      userVote: { type: newVoteType },
+      userVote: newVoteType,
     };
   }
 
   // Case 3: Adding new vote
   return {
     votesCount: currentVotesCount + (newVoteType === "UP" ? 1 : -1),
-    userVote: { type: newVoteType },
+    userVote: newVoteType,
   };
 }
 
@@ -179,12 +188,15 @@ export function useVoteIdea() {
      * 4. Return snapshots for rollback in onError
      */
     onMutate: async ({ ideaId, voteType }) => {
-      // Cancel all outgoing "ideas" queries to prevent them from overwriting our optimistic update
+      // Cancel all outgoing queries to prevent them from overwriting our optimistic update
       await queryClient.cancelQueries({ queryKey: ["ideas"] });
+      await queryClient.cancelQueries({ 
+        predicate: (query) => query.queryKey[0] === "profile-posts" 
+      });
 
       // Snapshot ALL queries matching ["ideas"] - critical for infinite scroll
       // getQueriesData returns array of [queryKey, data] tuples for ALL matching queries
-      const previousQueries = queryClient.getQueriesData<{
+      const previousIdeasQueries = queryClient.getQueriesData<{
         pages: Array<{
           ideas: IdeaVoteData[];
           nextCursor: string | null;
@@ -193,8 +205,18 @@ export function useVoteIdea() {
         pageParams: (string | undefined)[];
       }>({ queryKey: ["ideas"] });
 
-      // Optimistically update ALL queries
-      // setQueriesData updates every query matching ["ideas"]
+      // Snapshot profile-posts queries
+      const previousProfileQueries = queryClient.getQueriesData<{
+        pages: Array<{
+          posts: IdeaVoteData[];
+          nextCursor: string | null;
+        }>;
+        pageParams: (string | undefined)[];
+      }>({ 
+        predicate: (query) => query.queryKey[0] === "profile-posts" 
+      });
+
+      // Optimistically update ALL "ideas" queries
       queryClient.setQueriesData<{
         pages: Array<{
           ideas: IdeaVoteData[];
@@ -210,28 +232,63 @@ export function useVoteIdea() {
           pages: old.pages.map((page) => ({
             ...page,
             ideas: page.ideas.map((idea) => {
-              // Only update the specific idea being voted on
               if (idea.id !== ideaId) return idea;
 
-              // Calculate new vote state
               const { votesCount, userVote } = calculateVoteUpdate(
                 idea.votesCount,
                 idea.userVote,
                 voteType
               );
 
-              return {
-                ...idea,
-                votesCount,
-                userVote,
-              };
+              return { ...idea, votesCount, userVote };
             }),
           })),
         };
       });
 
-      // Return snapshot of ALL queries for rollback
-      return { previousQueries };
+      // Optimistically update ALL "profile-posts" queries
+      // Note: Profile posts use 'votes' field instead of 'userVote'
+      queryClient.setQueriesData<{
+        pages: Array<{
+          posts: Array<{
+            id: string;
+            votesCount: number;
+            votes?: VoteType | null;
+            [key: string]: any;
+          }>;
+          nextCursor: string | null;
+        }>;
+        pageParams: (string | undefined)[];
+      }>({ 
+        predicate: (query) => query.queryKey[0] === "profile-posts" 
+      }, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            posts: page.posts.map((post) => {
+              if (post.id !== ideaId) return post;
+
+              const { votesCount, userVote } = calculateVoteUpdate(
+                post.votesCount,
+                post.votes,
+                voteType
+              );
+
+              // Use 'votes' field for profile posts
+              return { ...post, votesCount, votes: userVote };
+            }),
+          })),
+        };
+      });
+
+      // Return snapshots of ALL queries for rollback
+      return { 
+        previousIdeasQueries, 
+        previousProfileQueries 
+      };
     },
 
     /**
@@ -241,8 +298,7 @@ export function useVoteIdea() {
      * Don't rely solely on invalidateQueries - it's async and can cause rollback
      */
     onSuccess: (serverData, { ideaId }) => {
-      // Write server-confirmed data to ALL queries
-      // This ensures cache matches server state exactly
+      // Write server-confirmed data to ALL "ideas" queries
       queryClient.setQueriesData<{
         pages: Array<{
           ideas: IdeaVoteData[];
@@ -259,12 +315,45 @@ export function useVoteIdea() {
             ...page,
             ideas: page.ideas.map((idea) => {
               if (idea.id !== ideaId) return idea;
-
-              // Update with server-confirmed data
               return {
                 ...idea,
                 votesCount: serverData.votesCount,
                 userVote: serverData.userVote,
+              };
+            }),
+          })),
+        };
+      });
+
+      // Write server-confirmed data to ALL "profile-posts" queries
+      // Note: Profile posts use 'votes' field instead of 'userVote'
+      queryClient.setQueriesData<{
+        pages: Array<{
+          posts: Array<{
+            id: string;
+            votesCount: number;
+            votes?: VoteType | null;
+            [key: string]: any;
+          }>;
+          nextCursor: string | null;
+        }>;
+        pageParams: (string | undefined)[];
+      }>({ 
+        predicate: (query) => query.queryKey[0] === "profile-posts" 
+      }, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            posts: page.posts.map((post) => {
+              if (post.id !== ideaId) return post;
+              // Use 'votes' field for profile posts
+              return {
+                ...post,
+                votesCount: serverData.votesCount,
+                votes: serverData.userVote,
               };
             }),
           })),
@@ -279,8 +368,13 @@ export function useVoteIdea() {
      */
     onError: (_error, _variables, context) => {
       // Rollback ALL queries to their pre-mutation state
-      if (context?.previousQueries) {
-        context.previousQueries.forEach(([queryKey, data]) => {
+      if (context?.previousIdeasQueries) {
+        context.previousIdeasQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      if (context?.previousProfileQueries) {
+        context.previousProfileQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
@@ -293,8 +387,9 @@ export function useVoteIdea() {
      * This ensures eventual consistency without blocking UI
      */
     onSettled: () => {
+      // Invalidate both ideas and profile-posts queries for background revalidation
       queryClient.invalidateQueries({
-        predicate: (q) => q.queryKey[0] === "ideas",
+        predicate: (q) => q.queryKey[0] === "ideas" || q.queryKey[0] === "profile-posts",
         refetchType: "inactive",
       });
     },
